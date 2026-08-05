@@ -93,9 +93,12 @@ export default function Stroke() {
           placeholder="Search radicals..."
         />
       </div>
+      <p className="helper" style={{ marginTop: -14 }}>
+        {filtered.length} of {radicals.length} radicals — scroll to see more
+      </p>
 
       <div className="stroke-picker">
-        {filtered.slice(0, 24).map(r => (
+        {filtered.map(r => (
           <div
             key={r.id}
             className={`stroke-pick ${selected && selected.id === r.id ? 'active' : ''}`}
