@@ -1,7 +1,26 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import HanziWriter from 'hanzi-writer'
 import { api } from '../api.js'
 import './Stroke.css'
+
+const DATA_URL = char =>
+  `https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(char)}.json`
+
+// Some radical entries store compound forms like "長 (镸, 长)" — always use just
+// the primary character for rendering, same as the original app did.
+const primaryChar = (character) => (character || '').split(' ')[0].trim()
+
+// Custom loader so a missing/unavailable character fails cleanly instead of
+// leaving HanziWriter in a broken, partially-rendered state.
+function safeCharDataLoader(char, onComplete, onError) {
+  fetch(DATA_URL(char))
+    .then(res => {
+      if (!res.ok) throw new Error('no stroke data')
+      return res.json()
+    })
+    .then(onComplete)
+    .catch(() => onError && onError())
+}
 
 export default function Stroke() {
   const [radicals, setRadicals] = useState([])
@@ -9,6 +28,7 @@ export default function Stroke() {
   const [selected, setSelected] = useState(null)
   const [mode, setMode] = useState('demo')
   const [quizMessage, setQuizMessage] = useState('')
+  const [dataUnavailable, setDataUnavailable] = useState(false)
   const targetRef = useRef(null)
   const writerRef = useRef(null)
 
@@ -19,12 +39,17 @@ export default function Stroke() {
     })
   }, [])
 
-  useEffect(() => {
-    if (!selected || !targetRef.current) return
+  const createWriter = useCallback((character, currentMode) => {
+    if (!targetRef.current) return
+    const char = primaryChar(character)
     targetRef.current.innerHTML = ''
     setQuizMessage('')
+    setDataUnavailable(false)
+    writerRef.current = null
 
-    const writer = HanziWriter.create(targetRef.current, selected.character, {
+    let cancelled = false
+
+    const writer = HanziWriter.create(targetRef.current, char, {
       width: 220,
       height: 220,
       padding: 12,
@@ -33,11 +58,21 @@ export default function Stroke() {
       outlineColor: 'rgba(212,169,78,0.25)',
       drawingWidth: 24,
       showOutline: true,
-      showCharacter: mode === 'practice' ? false : true
+      showCharacter: currentMode === 'practice' ? false : true,
+      charDataLoader: (char, onComplete) => {
+        safeCharDataLoader(char, (data) => {
+          if (cancelled) return
+          onComplete(data)
+        }, () => {
+          if (cancelled) return
+          if (targetRef.current) targetRef.current.innerHTML = ''
+          setDataUnavailable(true)
+        })
+      }
     })
     writerRef.current = writer
 
-    if (mode === 'demo') {
+    if (currentMode === 'demo') {
       writer.animateCharacter()
     } else {
       writer.quiz({
@@ -47,10 +82,17 @@ export default function Stroke() {
       })
     }
 
+    return () => { cancelled = true }
+  }, [])
+
+  useEffect(() => {
+    if (!selected) return
+    const cancel = createWriter(selected.character, mode)
     return () => {
+      if (cancel) cancel()
       writerRef.current = null
     }
-  }, [selected, mode])
+  }, [selected, mode, createWriter])
 
   const filtered = query
     ? radicals.filter(r =>
@@ -61,23 +103,11 @@ export default function Stroke() {
     : radicals
 
   const replay = () => {
-    if (mode === 'demo' && writerRef.current) {
+    if (!selected) return
+    if (mode === 'demo' && writerRef.current && !dataUnavailable) {
       writerRef.current.animateCharacter()
-    } else if (mode === 'practice' && selected && targetRef.current) {
-      targetRef.current.innerHTML = ''
-      const writer = HanziWriter.create(targetRef.current, selected.character, {
-        width: 220, height: 220, padding: 12,
-        strokeColor: '#f0d99a', radicalColor: '#e8203f',
-        outlineColor: 'rgba(212,169,78,0.25)', drawingWidth: 24,
-        showOutline: true, showCharacter: false
-      })
-      writerRef.current = writer
-      setQuizMessage('')
-      writer.quiz({
-        onMistake: () => setQuizMessage('Not quite — try that stroke again.'),
-        onCorrectStroke: () => setQuizMessage('Nice — keep going.'),
-        onComplete: () => setQuizMessage('Great job! Character complete.')
-      })
+    } else {
+      createWriter(selected.character, mode)
     }
   }
 
@@ -104,7 +134,7 @@ export default function Stroke() {
             className={`stroke-pick ${selected && selected.id === r.id ? 'active' : ''}`}
             onClick={() => setSelected(r)}
           >
-            {r.character}
+            {primaryChar(r.character)}
           </div>
         ))}
       </div>
@@ -112,7 +142,13 @@ export default function Stroke() {
       {selected && (
         <div className="stroke-wrap">
           <div className="stroke-box">
-            <div ref={targetRef}></div>
+            {dataUnavailable ? (
+              <p className="helper" style={{ textAlign: 'center', margin: 0, padding: '0 16px' }}>
+                Stroke data isn't available for this character yet.
+              </p>
+            ) : (
+              <div ref={targetRef}></div>
+            )}
           </div>
           <div>
             <div className="mode-toggle">
@@ -120,16 +156,20 @@ export default function Stroke() {
               <span className={mode === 'practice' ? 'active' : ''} onClick={() => setMode('practice')}>Practice</span>
             </div>
             <p className="helper" style={{ marginBottom: 14 }}>
-              {selected.pinyin} · {selected.meaning}
+              {selected.character} · {selected.pinyin} · {selected.meaning}
             </p>
             <p className="helper" style={{ marginBottom: 14 }}>
-              {mode === 'demo'
-                ? 'Watch the animated stroke-by-stroke guide.'
-                : 'Trace each stroke in order. Mistakes are okay — keep going.'}
+              {dataUnavailable
+                ? 'Try another radical from the list above.'
+                : mode === 'demo'
+                  ? 'Watch the animated stroke-by-stroke guide.'
+                  : 'Trace each stroke in order. Mistakes are okay — keep going.'}
             </p>
-            <button className="btn" onClick={replay}>
-              {mode === 'demo' ? '▶ replay animation' : '↻ restart practice'}
-            </button>
+            {!dataUnavailable && (
+              <button className="btn" onClick={replay}>
+                {mode === 'demo' ? '▶ replay animation' : '↻ restart practice'}
+              </button>
+            )}
             {quizMessage && <p className="quiz-msg">{quizMessage}</p>}
           </div>
         </div>
