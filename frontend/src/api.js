@@ -1,4 +1,5 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+const RAW_API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+const API_BASE = RAW_API_BASE.replace(/\/+$/, '')
 
 async function request(path, options = {}) {
   const token = localStorage.getItem('mandalink_token')
