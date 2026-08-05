@@ -55,5 +55,8 @@ export const api = {
     request('/api/auth/google', { method: 'POST', body: JSON.stringify({ idToken }) }),
 
   forgotUsername: (email) =>
-    request('/api/auth/forgot-username', { method: 'POST', body: JSON.stringify({ email }) })
+    request('/api/auth/forgot-username', { method: 'POST', body: JSON.stringify({ email }) }),
+
+  contactSupport: (email) =>
+    request('/api/support/contact', { method: 'POST', body: JSON.stringify({ email }) })
 }
