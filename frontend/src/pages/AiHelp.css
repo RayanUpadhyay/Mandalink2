@@ -1,0 +1,51 @@
+.chat-wrap {
+  max-width: 520px;
+  margin: 0 auto;
+}
+#chatLog {
+  margin-bottom: 16px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+.msg {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.msg .bubble {
+  padding: 11px 15px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 380px;
+}
+.msg.user {
+  justify-content: flex-end;
+}
+.msg.user .bubble {
+  background: linear-gradient(120deg, var(--crimson-bright), var(--crimson));
+  color: #fff;
+}
+.msg.ai .bubble {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  color: var(--text-mid);
+}
+.chat-input {
+  display: flex;
+  gap: 10px;
+}
+.chat-input input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-size: 13px;
+  color: var(--text-hi);
+  font-family: inherit;
+}
+.chat-input input:focus {
+  outline: none;
+  border-color: var(--gold);
+}

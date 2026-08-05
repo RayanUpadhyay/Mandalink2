@@ -1,0 +1,55 @@
+.auth-card {
+  max-width: 360px;
+  margin: 40px auto 0;
+}
+.tab-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 9px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-low);
+  border: 1px solid transparent;
+}
+.tab.active {
+  background: var(--panel);
+  border-color: var(--panel-border);
+  color: var(--gold-soft);
+}
+.field {
+  margin-bottom: 14px;
+}
+.field label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-low);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.field input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 14px;
+  color: var(--text-hi);
+  font-family: inherit;
+}
+.field input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+.auth-msg {
+  font-size: 12.5px;
+  margin-top: 12px;
+  text-align: center;
+}

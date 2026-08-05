@@ -1,0 +1,120 @@
+.beams-hero {
+  position: relative;
+  height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 10px;
+  background:
+    repeating-linear-gradient(90deg, rgba(212, 169, 78, 0.05) 0 1px, transparent 1px 64px),
+    repeating-linear-gradient(0deg, rgba(212, 169, 78, 0.05) 0 1px, transparent 1px 64px),
+    radial-gradient(ellipse at 50% 30%, rgba(179, 18, 44, 0.14), transparent 65%);
+  border: 1px solid var(--panel-border);
+}
+
+.beam {
+  position: absolute;
+  top: -140px;
+  width: 2px;
+  height: 140px;
+  background: linear-gradient(to bottom, transparent, var(--gold-soft) 20%, var(--crimson-bright) 70%, transparent);
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes fall {
+  0% { transform: translateY(0); opacity: 0; }
+  8% { opacity: 0.9; }
+  58% { opacity: 0.9; }
+  62% { opacity: 0; }
+  100% { transform: translateY(420px); opacity: 0; }
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 5;
+  text-align: center;
+  padding: 0 30px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  color: var(--gold-soft);
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.eyebrow .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--crimson-bright);
+}
+
+.hero-h {
+  font-size: 32px;
+  line-height: 1.15;
+  font-weight: 800;
+  margin: 0 0 14px;
+}
+
+.hero-sub {
+  color: var(--text-mid);
+  font-size: 13.5px;
+  max-width: 400px;
+  margin: 0 auto 22px;
+}
+
+.hero-auth-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 30px;
+}
+.feat {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 16px;
+  cursor: pointer;
+}
+.feat:hover {
+  border-color: var(--gold);
+}
+.feat .ic {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  color: var(--gold-soft);
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+.feat h3 {
+  font-size: 13px;
+  margin: 0 0 4px;
+}
+.feat p {
+  font-size: 11.5px;
+  color: var(--text-low);
+  margin: 0;
+}
+
+@media (max-width: 800px) {
+  .feat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

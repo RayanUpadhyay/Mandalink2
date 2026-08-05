@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital@0;1&display=swap');
+
+:root {
+  --bg: #0b0808;
+  --panel-bg: #130f0e;
+  --crimson: #b3122c;
+  --crimson-bright: #e8203f;
+  --gold: #d4a94e;
+  --gold-soft: #f0d99a;
+  --teal: #3f8f82;
+  --panel: rgba(255, 255, 255, 0.04);
+  --panel-border: rgba(212, 169, 78, 0.20);
+  --text-hi: #f6efe4;
+  --text-mid: #c9beae;
+  --text-low: #8b8178;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-hi);
+  font-family: 'Manrope', sans-serif;
+}
+
+.accent {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 400;
+  background: linear-gradient(100deg, var(--gold-soft), var(--crimson-bright) 75%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.btn {
+  padding: 11px 22px;
+  border-radius: 999px;
+  border: 1px solid var(--panel-border);
+  background: var(--panel);
+  color: var(--text-mid);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn:hover {
+  color: var(--text-hi);
+  border-color: var(--text-low);
+}
+.btn.primary {
+  background: linear-gradient(120deg, var(--crimson-bright), var(--crimson));
+  color: #fff;
+  border: none;
+}
+
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 50px 28px 90px;
+}
+
+.page-h {
+  font-size: 26px;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+.helper {
+  font-size: 13.5px;
+  color: var(--text-low);
+  margin: 0 0 26px;
+}
