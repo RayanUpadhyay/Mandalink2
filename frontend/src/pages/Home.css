@@ -1,26 +1,7 @@
-.hero-laser-wrap {
-  position: relative;
-  height: 560px;
-  border-radius: 20px;
-  overflow: hidden;
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.hero-laser-wrap .laser-flow-container {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
-
 .hero {
-  position: relative;
-  z-index: 5;
-  padding: 44px 40px;
+  padding: 56px 48px;
   text-align: center;
-  width: 88%;
-  max-width: 620px;
+  margin-top: 10px;
 }
 .hero-logo {
   width: 100px;

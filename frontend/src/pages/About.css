@@ -32,37 +32,3 @@
 @media (max-width: 800px) {
   .about-card { padding: 32px 24px; }
 }
-
-.contact-card {
-  max-width: 720px;
-  margin: 20px auto 0;
-  padding: 40px 48px;
-  text-align: center;
-}
-.contact-h {
-  font-size: 22px;
-  margin: 0 0 8px;
-}
-.contact-input-wrap {
-  display: flex;
-  justify-content: center;
-}
-
-@media (max-width: 800px) {
-  .contact-card { padding: 28px 20px; }
-}
-
-.auth-msg {
-  font-size: 13.5px;
-  text-align: center;
-  padding: 10px;
-  border-radius: 8px;
-}
-.auth-msg.error {
-  color: #b3372a;
-  background: #fbeae7;
-}
-.auth-msg.success {
-  color: var(--teal);
-  background: #e8f6f3;
-}

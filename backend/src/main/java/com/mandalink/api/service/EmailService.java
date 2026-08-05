@@ -79,33 +79,4 @@ public class EmailService {
             return false;
         }
     }
-
-    public boolean sendSupportRequestEmail(String fromUserEmail) {
-        if (!isConfigured()) {
-            return false;
-        }
-        try {
-            RestClient client = RestClient.create();
-            String html = "<p>New support request from Mandalink.</p>"
-                + "<p>User's email: <strong>" + fromUserEmail + "</strong></p>"
-                + "<p>Reply directly to this address to get back to them.</p>";
-
-            client.post()
-                .uri("https://api.resend.com/emails")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + resendApiKey)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Map.of(
-                    "from", "Mandalink <" + fromEmail + ">",
-                    "to", new String[]{"mandalinksupport@gmail.com"},
-                    "reply_to", fromUserEmail,
-                    "subject", "New Mandalink support request",
-                    "html", html
-                ))
-                .retrieve()
-                .toBodilessEntity();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 }
