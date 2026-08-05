@@ -1,79 +1,57 @@
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useRef, useState } from 'react'
-import SpecularButton from '../components/SpecularButton.jsx'
+import { useEffect, useState } from 'react'
 import { api } from '../api.js'
 import './Home.css'
 
 export default function Home({ user }) {
   const navigate = useNavigate()
-  const heroRef = useRef(null)
   const [radicalCount, setRadicalCount] = useState(null)
-  const [entered, setEntered] = useState(false)
 
   useEffect(() => {
     api.getRadicalCount().then(data => setRadicalCount(data.count)).catch(() => {})
   }, [])
 
-  useEffect(() => {
-    const hero = heroRef.current
-    if (!hero) return
-    const beams = []
-    for (let i = 0; i < 12; i++) {
-      const leftPct = 4 + Math.random() * 92
-      const duration = 2.4 + Math.random() * 1.8
-      const delay = Math.random() * duration
-      const beam = document.createElement('div')
-      beam.className = 'beam'
-      beam.style.left = leftPct + '%'
-      beam.style.animationDuration = duration + 's'
-      beam.style.animationDelay = '-' + delay + 's'
-      hero.appendChild(beam)
-      beams.push(beam)
-    }
-    return () => beams.forEach(b => b.remove())
-  }, [entered])
-
-  if (!entered) {
-    return (
-      <div className="page">
-        <div className="gate-screen beams-hero" ref={heroRef}>
-          <div className="gate-btn-wrap">
-            <SpecularButton onClick={() => setEntered(true)}>enter mandalink</SpecularButton>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="page">
-      <div className="beams-hero" ref={heroRef}>
-        <div className="hero-copy">
-          <img src="/logo.png" alt="Mandalink logo" className="hero-logo" />
-          <div className="eyebrow"><span className="dot" />{radicalCount !== null ? radicalCount : '…'} radicals · free forever</div>
-          <h1 className="hero-h">Learn the building<br />blocks of <span className="accent">Mandarin</span></h1>
-          <p className="hero-sub">Flashcards, stroke order, timed challenges, and an AI tutor.</p>
-          <button className="btn primary" onClick={() => navigate('/radicals')}>explore radicals</button>
+      <div className="hero card">
+        <img src="/logo.png" alt="Mandalink logo" className="hero-logo" />
+        <h1 className="hero-h">Mandalink</h1>
+        <p className="hero-tagline">Chinese Radicals Simplified</p>
+        <div className="hero-divider"></div>
+        <p className="hero-desc">
+          Mandalink is your gateway to mastering the building blocks of Chinese — radicals.
+          Through interactive flashcards, AI-powered hints, timed challenges, and animated
+          stroke-order guides, we make learning Chinese characters intuitive, engaging, and
+          effective. Whether you're a complete beginner or brushing up your skills, Mandalink
+          adapts to your pace and helps you build lasting knowledge.
+        </p>
+        <p className="hero-featuring">Featuring</p>
+        <p className="hero-feature-list">Flashcards &bull; Quiz Games &bull; Stroke Order &bull; Timed Mode &bull; AI Help &bull; Leaderboard</p>
+
+        <div className="hero-cta-row">
+          <button className="btn primary hero-cta" onClick={() => navigate(user ? '/radicals' : '/auth')}>
+            {user ? 'Explore Radicals' : 'Get Started'}
+          </button>
           {!user && (
-            <div className="hero-auth-row">
-              <button className="btn" onClick={() => navigate('/auth')}>log in</button>
-              <button className="btn" onClick={() => navigate('/auth')}>sign up</button>
-            </div>
+            <button className="btn" onClick={() => navigate('/auth')}>Sign In</button>
           )}
         </div>
+        {radicalCount !== null && (
+          <p className="hero-count">{radicalCount} radicals ready to learn — free forever</p>
+        )}
       </div>
 
       <div className="feat-grid">
-        <div className="feat" onClick={() => navigate('/flashcards')}>
+        <div className="feat" onClick={() => navigate(user ? '/flashcards' : '/auth')}>
           <div className="ic">卡</div><h3>Flashcards</h3><p>Flip through radicals at your pace.</p>
         </div>
-        <div className="feat" onClick={() => navigate('/stroke')}>
-          <div className="ic">笔</div><h3>Stroke order</h3><p>Animated guides, then trace it.</p>
+        <div className="feat" onClick={() => navigate(user ? '/stroke' : '/auth')}>
+          <div className="ic">笔</div><h3>Stroke Order</h3><p>Animated guides, then trace it.</p>
         </div>
-        <div className="feat" onClick={() => navigate('/timed')}>
-          <div className="ic">时</div><h3>Timed mode</h3><p>60 seconds on the clock.</p>
+        <div className="feat" onClick={() => navigate(user ? '/timed' : '/auth')}>
+          <div className="ic">时</div><h3>Timed Mode</h3><p>60 seconds on the clock.</p>
         </div>
-        <div className="feat" onClick={() => navigate('/leaderboard')}>
+        <div className="feat" onClick={() => navigate(user ? '/leaderboard' : '/auth')}>
           <div className="ic">榜</div><h3>Leaderboard</h3><p>Climb the ranks with XP.</p>
         </div>
       </div>

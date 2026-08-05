@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { api } from '../api.js'
+import './Auth.css'
 
 export default function ResetPassword() {
   const [searchParams] = useSearchParams()
@@ -43,8 +44,8 @@ export default function ResetPassword() {
 
   return (
     <div className="page">
-      <div className="auth-card">
-        <h2 className="page-h" style={{ fontSize: 20, marginBottom: 6 }}>Set a new password</h2>
+      <div className="auth-card card">
+        <h2 className="page-h" style={{ fontSize: 22, marginBottom: 6 }}>Set a new password</h2>
         <p className="helper">Choose a new password for your account.</p>
         <div className="field">
           <label>New password</label>
@@ -57,11 +58,7 @@ export default function ResetPassword() {
         <button className="btn primary" style={{ width: '100%' }} onClick={submit} disabled={loading}>
           {loading ? 'Please wait...' : 'Reset password'}
         </button>
-        {message && (
-          <div className="auth-msg" style={{ color: message.type === 'error' ? 'var(--crimson-bright)' : 'var(--teal)' }}>
-            {message.text}
-          </div>
-        )}
+        {message && <div className={`auth-msg ${message.type}`}>{message.text}</div>}
       </div>
     </div>
   )

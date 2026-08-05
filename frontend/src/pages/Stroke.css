@@ -16,14 +16,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Playfair Display', serif;
+  
   font-size: 18px;
   color: var(--text-mid);
   cursor: pointer;
 }
 .stroke-pick.active {
-  border-color: var(--gold);
-  color: var(--gold-soft);
+  border-color: var(--blue-dark);
+  color: var(--blue);
   background: rgba(212, 169, 78, 0.1);
 }
 .stroke-wrap {
@@ -56,12 +56,12 @@
 }
 .mode-toggle span.active {
   background: var(--panel);
-  color: var(--gold-soft);
+  color: var(--blue);
 }
 .quiz-msg {
   margin-top: 14px;
   font-size: 13px;
-  color: var(--gold-soft);
+  color: var(--blue);
 }
 
 @media (max-width: 800px) {

@@ -1,18 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --bg: #0b0808;
-  --panel-bg: #130f0e;
-  --crimson: #b3122c;
-  --crimson-bright: #e8203f;
-  --gold: #d4a94e;
-  --gold-soft: #f0d99a;
-  --teal: #3f8f82;
-  --panel: rgba(255, 255, 255, 0.04);
-  --panel-border: rgba(212, 169, 78, 0.20);
-  --text-hi: #f6efe4;
-  --text-mid: #c9beae;
-  --text-low: #8b8178;
+  --bg: #faf7f2;
+  --panel-bg: #ffffff;
+  --blue: #0f6cbd;
+  --blue-dark: #115ea3;
+  --blue-soft: #ebf3fc;
+  --gold: #b98a2e;
+  --teal: #147a6e;
+  --panel: #ffffff;
+  --panel-border: #e4ddd0;
+  --text-hi: #242424;
+  --text-mid: #4a4642;
+  --text-low: #7a746a;
+  --radius: 12px;
 }
 
 * {
@@ -21,62 +22,70 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image: url('/background.jpeg');
+  background-repeat: repeat;
+  background-size: 900px;
   color: var(--text-hi);
   font-family: 'Manrope', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
+h1, h2, h3 { font-weight: 800; letter-spacing: -0.01em; }
+
 .accent {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-weight: 400;
-  background: linear-gradient(100deg, var(--gold-soft), var(--crimson-bright) 75%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--blue);
+  font-weight: 700;
 }
 
 .btn {
-  padding: 11px 22px;
+  padding: 12px 24px;
   border-radius: 999px;
-  border: 1px solid var(--panel-border);
-  background: var(--panel);
+  border: 1.5px solid var(--panel-border);
+  background: #ffffff;
   color: var(--text-mid);
   font-family: inherit;
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 .btn:hover {
-  color: var(--text-hi);
-  border-color: var(--text-low);
+  border-color: var(--blue);
+  color: var(--blue-dark);
 }
 .btn.primary {
-  background: linear-gradient(120deg, var(--crimson-bright), var(--crimson));
+  background: var(--blue);
   color: #fff;
   border: none;
+  box-shadow: 0 4px 14px rgba(15, 108, 189, 0.25);
+}
+.btn.primary:hover {
+  background: var(--blue-dark);
 }
 
 .page {
-  max-width: 900px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 50px 28px 90px;
-}
-
-@media (min-width: 1100px) {
-  .app-content.with-wheel .page {
-    margin-left: 280px;
-  }
+  padding: 48px 28px 90px;
 }
 
 .page-h {
-  font-size: 26px;
+  font-size: 30px;
   font-weight: 800;
-  margin: 0 0 8px;
+  margin: 0 0 10px;
 }
 
 .helper {
-  font-size: 13.5px;
+  font-size: 15px;
   color: var(--text-low);
   margin: 0 0 26px;
+}
+
+.card {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
 }

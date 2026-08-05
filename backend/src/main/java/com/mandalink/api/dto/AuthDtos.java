@@ -19,4 +19,9 @@ public class AuthDtos {
 
     public record DirectResetRequest(String username, String email, String newPassword) {}
     public record DirectResetResponse(boolean success, String message) {}
+
+    public record GoogleAuthRequest(String idToken) {}
+
+    public record ForgotUsernameRequest(String email) {}
+    public record ForgotUsernameResponse(boolean success, String message, String directUsername) {}
 }

@@ -50,4 +50,33 @@ public class EmailService {
             return false;
         }
     }
+
+    public boolean sendUsernameEmail(String toEmail, String username) {
+        if (!isConfigured()) {
+            return false;
+        }
+        try {
+            RestClient client = RestClient.create();
+            String html = "<p>Hi there,</p>"
+                + "<p>You asked us to remind you of your Mandalink username. It's:</p>"
+                + "<p><strong>" + username + "</strong></p>"
+                + "<p>If you didn't request this, you can ignore this email.</p>";
+
+            client.post()
+                .uri("https://api.resend.com/emails")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + resendApiKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of(
+                    "from", "Mandalink <" + fromEmail + ">",
+                    "to", new String[]{toEmail},
+                    "subject", "Your Mandalink username",
+                    "html", html
+                ))
+                .retrieve()
+                .toBodilessEntity();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

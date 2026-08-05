@@ -49,5 +49,11 @@ export const api = {
     request('/api/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, newPassword }) }),
 
   resetPasswordDirect: (username, email, newPassword) =>
-    request('/api/auth/reset-password-direct', { method: 'POST', body: JSON.stringify({ username, email, newPassword }) })
+    request('/api/auth/reset-password-direct', { method: 'POST', body: JSON.stringify({ username, email, newPassword }) }),
+
+  googleAuth: (idToken) =>
+    request('/api/auth/google', { method: 'POST', body: JSON.stringify({ idToken }) }),
+
+  forgotUsername: (email) =>
+    request('/api/auth/forgot-username', { method: 'POST', body: JSON.stringify({ email }) })
 }

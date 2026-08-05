@@ -8,8 +8,10 @@ import com.mandalink.api.service.JwtService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClient;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -23,6 +25,9 @@ public class AuthController {
 
     @Value("${app.frontend-base-url:https://mandalink.org}")
     private String frontendBaseUrl;
+
+    @Value("${app.google.client-id:}")
+    private String googleClientId;
 
     public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder,
                            JwtService jwtService, EmailService emailService) {
@@ -153,5 +158,94 @@ public class AuthController {
         userRepository.save(user);
 
         return new DirectResetResponse(true, "Password reset. You can now log in with your new password.");
+    }
+
+    @PostMapping("/google")
+    public AuthResponse googleAuth(@RequestBody GoogleAuthRequest req) {
+        if (googleClientId == null || googleClientId.isBlank()) {
+            return new AuthResponse(false, "Google Sign-In isn't configured yet.", null, null);
+        }
+        if (req.idToken() == null || req.idToken().isBlank()) {
+            return new AuthResponse(false, "Missing Google credential.", null, null);
+        }
+
+        Map<?, ?> tokenInfo;
+        try {
+            RestClient client = RestClient.create();
+            tokenInfo = client.get()
+                .uri("https://oauth2.googleapis.com/tokeninfo?id_token=" + req.idToken())
+                .retrieve()
+                .body(Map.class);
+        } catch (Exception e) {
+            return new AuthResponse(false, "Could not verify Google credential.", null, null);
+        }
+
+        if (tokenInfo == null) {
+            return new AuthResponse(false, "Could not verify Google credential.", null, null);
+        }
+
+        String aud = (String) tokenInfo.get("aud");
+        String emailVerified = (String) tokenInfo.get("email_verified");
+        String email = (String) tokenInfo.get("email");
+        String name = (String) tokenInfo.get("name");
+
+        if (!googleClientId.equals(aud)) {
+            return new AuthResponse(false, "Google credential was not issued for this app.", null, null);
+        }
+        if (!"true".equals(emailVerified) || email == null) {
+            return new AuthResponse(false, "Google account email is not verified.", null, null);
+        }
+
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        if (user == null) {
+            String baseUsername = (name != null && !name.isBlank())
+                ? name.replaceAll("\\s+", "").toLowerCase()
+                : email.split("@")[0];
+            String candidate = baseUsername;
+            int suffix = 1;
+            while (userRepository.existsByUsername(candidate)) {
+                candidate = baseUsername + suffix;
+                suffix++;
+            }
+
+            user = new User();
+            user.setUsername(candidate);
+            user.setEmail(email);
+            user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
+            user.setAuthProvider("google");
+            user.setXp(0);
+            user.setLevel(1);
+            userRepository.save(user);
+        }
+
+        String token = jwtService.generateToken(user.getUsername());
+        return new AuthResponse(true, "Signed in with Google", token,
+                new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel()));
+    }
+
+    @PostMapping("/forgot-username")
+    public ForgotUsernameResponse forgotUsername(@RequestBody ForgotUsernameRequest req) {
+        if (req.email() == null || req.email().isBlank()) {
+            return new ForgotUsernameResponse(false, "Enter your account email.", null);
+        }
+
+        var userOpt = userRepository.findByEmail(req.email());
+        if (userOpt.isEmpty()) {
+            // Don't reveal whether the email exists
+            return new ForgotUsernameResponse(true,
+                "If that email is on an account, we've sent the username to it.", null);
+        }
+
+        User user = userOpt.get();
+        boolean emailed = emailService.sendUsernameEmail(user.getEmail(), user.getUsername());
+
+        if (emailed) {
+            return new ForgotUsernameResponse(true,
+                "If that email is on an account, we've sent the username to it.", null);
+        } else {
+            return new ForgotUsernameResponse(true,
+                "Email isn't configured yet — here's your username directly.", user.getUsername());
+        }
     }
 }

@@ -1,40 +1,63 @@
 import { NavLink, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import './Nav.css'
 
 const LINKS = [
-  { to: '/', label: 'home' },
-  { to: '/radicals', label: 'radicals' },
-  { to: '/flashcards', label: 'flashcards' },
-  { to: '/quiz', label: 'quiz' },
-  { to: '/timed', label: 'timed mode' },
-  { to: '/leaderboard', label: 'leaderboard' },
-  { to: '/stroke', label: 'stroke order' },
-  { to: '/ai', label: 'ai help' }
+  { to: '/', label: 'Home' },
+  { to: '/radicals', label: 'Radicals' },
+  { to: '/flashcards', label: 'Flashcards' },
+  { to: '/quiz', label: 'Quiz' },
+  { to: '/timed', label: 'Timed Mode' },
+  { to: '/leaderboard', label: 'Leaderboard' },
+  { to: '/stroke', label: 'Stroke Order' },
+  { to: '/ai', label: 'AI Help' },
+  { to: '/about', label: 'About' }
 ]
 
 export default function Nav({ user, onLogout }) {
   const navigate = useNavigate()
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  const go = (path) => {
+    setMenuOpen(false)
+    navigate(path)
+  }
 
   return (
     <div className="topnav">
-      <div className="logo-group">
+      <div className="logo-group" onClick={() => go('/')}>
         <img src="/logo.png" alt="Mandalink logo" />
-        mandalink
+        <span>mandalink</span>
       </div>
+
+      <div className="nav-links">
+        {LINKS.map(link => (
+          <NavLink key={link.to} to={link.to} end={link.to === '/'} className={({ isActive }) => isActive ? 'active' : ''}>
+            {link.label}
+          </NavLink>
+        ))}
+      </div>
+
       <div className="nav-right">
-        <div className="nav-links">
+        {user ? (
+          <button className="signin-btn" onClick={onLogout}>{user.username} · Log out</button>
+        ) : (
+          <button className="signin-btn primary" onClick={() => go('/auth')}>Sign in</button>
+        )}
+        <button className="menu-toggle" onClick={() => setMenuOpen(o => !o)} aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+      {menuOpen && (
+        <div className="mobile-menu">
           {LINKS.map(link => (
-            <NavLink key={link.to} to={link.to} className={({ isActive }) => isActive ? 'active' : ''}>
+            <div key={link.to} className="mobile-menu-link" onClick={() => go(link.to)}>
               {link.label}
-            </NavLink>
+            </div>
           ))}
         </div>
-        {user ? (
-          <button className="signin-btn" onClick={onLogout}>{user.username} · log out</button>
-        ) : (
-          <button className="signin-btn" onClick={() => navigate('/auth')}>sign in</button>
-        )}
-      </div>
+      )}
     </div>
   )
 }
