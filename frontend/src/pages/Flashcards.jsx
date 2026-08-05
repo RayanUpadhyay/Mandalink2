@@ -28,7 +28,7 @@ export default function Flashcards() {
   return (
     <div className="page">
       <h2 className="page-h">Flashcards</h2>
-      <p className="helper">Click a card to flip it, or use the arrows to move through the deck.</p>
+      <p className="helper">Click the card to flip it, or use the arrows to move through the deck.</p>
       <div className="carousel-outer">
         <div className="carousel-track">
           {radicals.map((r, i) => {
@@ -40,7 +40,7 @@ export default function Flashcards() {
             return (
               <div
                 key={r.id}
-                className={`flash-slide ${isActive && flipped ? 'flipped' : ''}`}
+                className="flash-slide"
                 style={{
                   transform: `translateX(${offset * 160}px) scale(${isActive ? 1 : 0.78}) rotateY(${offset * -22}deg)`,
                   opacity: abs > 2 ? 0 : (isActive ? 1 : 0.5),
@@ -48,10 +48,17 @@ export default function Flashcards() {
                 }}
                 onClick={() => isActive ? setFlipped(f => !f) : setActive(i)}
               >
-                <div className="ch">{r.character}</div>
-                <div className="py">{r.pinyin}</div>
-                <div className="mn">{r.meaning}</div>
-                <div className="tap-hint">tap to flip</div>
+                <div className={`flip-inner ${isActive && flipped ? 'is-flipped' : ''}`}>
+                  <div className="flip-face flip-front">
+                    <div className="mn">{r.meaning}</div>
+                    <div className="tap-hint">tap to flip</div>
+                  </div>
+                  <div className="flip-face flip-back">
+                    <div className="ch">{r.character}</div>
+                    <div className="py">{r.pinyin}</div>
+                    <div className="tap-hint">tap to flip back</div>
+                  </div>
+                </div>
               </div>
             )
           })}

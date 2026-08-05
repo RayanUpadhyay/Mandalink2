@@ -10,4 +10,10 @@ public class AuthDtos {
     public record UserSummary(Long id, String username, Integer xp, Integer level) {}
 
     public record XpUpdateRequest(Integer amount) {}
+
+    public record ForgotPasswordRequest(String email) {}
+    public record ForgotPasswordResponse(boolean success, String message, String directResetLink) {}
+
+    public record ResetPasswordRequest(String token, String newPassword) {}
+    public record ResetPasswordResponse(boolean success, String message) {}
 }

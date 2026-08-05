@@ -5,6 +5,7 @@ import com.mandalink.api.repository.RadicalRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/radicals")
@@ -30,5 +31,10 @@ public class RadicalController {
         List<Radical> all = radicalRepository.findAll();
         if (all.isEmpty()) return null;
         return all.get((int) (Math.random() * all.size()));
+    }
+
+    @GetMapping("/count")
+    public Map<String, Long> count() {
+        return Map.of("count", radicalRepository.count());
     }
 }

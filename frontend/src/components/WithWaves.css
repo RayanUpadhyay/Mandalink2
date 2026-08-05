@@ -1,0 +1,13 @@
+.with-waves-wrap {
+  position: relative;
+  min-height: 100%;
+}
+.with-waves-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+.with-waves-content {
+  position: relative;
+  z-index: 1;
+}

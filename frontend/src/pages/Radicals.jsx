@@ -4,7 +4,12 @@ import { api } from '../api.js'
 export default function Radicals() {
   const [query, setQuery] = useState('')
   const [radicals, setRadicals] = useState([])
+  const [totalCount, setTotalCount] = useState(null)
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    api.getRadicalCount().then(data => setTotalCount(data.count)).catch(() => {})
+  }, [])
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -20,7 +25,7 @@ export default function Radicals() {
   return (
     <div className="page">
       <h2 className="page-h">Radical meanings</h2>
-      <p className="helper">Browse all 214 radicals. Search by character, pinyin, or meaning.</p>
+      <p className="helper">Browse all {totalCount !== null ? totalCount : ''} radicals. Search by character, pinyin, or meaning.</p>
       <div className="search-bar">
         <input
           value={query}

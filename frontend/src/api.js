@@ -30,6 +30,9 @@ export const api = {
   getRandomRadical: () =>
     request('/api/radicals/random'),
 
+  getRadicalCount: () =>
+    request('/api/radicals/count'),
+
   getLeaderboard: () =>
     request('/api/leaderboard'),
 
@@ -37,5 +40,11 @@ export const api = {
     request(`/api/users/${encodeURIComponent(username)}/xp`, { method: 'POST', body: JSON.stringify({ amount }) }),
 
   chat: (message) =>
-    request('/api/ai/chat', { method: 'POST', body: JSON.stringify({ message }) })
+    request('/api/ai/chat', { method: 'POST', body: JSON.stringify({ message }) }),
+
+  forgotPassword: (email) =>
+    request('/api/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
+
+  resetPassword: (token, newPassword) =>
+    request('/api/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, newPassword }) })
 }

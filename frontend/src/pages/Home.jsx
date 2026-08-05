@@ -1,13 +1,22 @@
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import SpecularButton from '../components/SpecularButton.jsx'
+import RippleDistortion from '../components/RippleDistortion/RippleDistortion.jsx'
+import { api } from '../api.js'
 import './Home.css'
 
 export default function Home({ user }) {
   const navigate = useNavigate()
   const heroRef = useRef(null)
+  const [radicalCount, setRadicalCount] = useState(null)
+  const [entered, setEntered] = useState(false)
 
   useEffect(() => {
+    api.getRadicalCount().then(data => setRadicalCount(data.count)).catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    if (!entered) return
     const hero = heroRef.current
     if (!hero) return
     const beams = []
@@ -24,16 +33,39 @@ export default function Home({ user }) {
       beams.push(beam)
     }
     return () => beams.forEach(b => b.remove())
-  }, [])
+  }, [entered])
+
+  if (!entered) {
+    return (
+      <div className="page">
+        <div className="gate-screen">
+          <div className="gate-ripple-bg">
+            <RippleDistortion
+              src="/hero.jpg"
+              brushSize={150}
+              strength={0.2}
+              swirl={1}
+              rings={4}
+              grayscale
+            />
+          </div>
+          <div className="gate-btn-wrap">
+            <SpecularButton onClick={() => setEntered(true)}>enter mandalink</SpecularButton>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="page">
       <div className="beams-hero" ref={heroRef}>
         <div className="hero-copy">
-          <div className="eyebrow"><span className="dot" />214 radicals · free forever</div>
+          <img src="/logo.png" alt="Mandalink logo" className="hero-logo" />
+          <div className="eyebrow"><span className="dot" />{radicalCount !== null ? radicalCount : '…'} radicals · free forever</div>
           <h1 className="hero-h">Learn the building<br />blocks of <span className="accent">Mandarin</span></h1>
           <p className="hero-sub">Flashcards, stroke order, timed challenges, and an AI tutor.</p>
-          <SpecularButton onClick={() => navigate('/radicals')}>enter mandalink</SpecularButton>
+          <button className="btn primary" onClick={() => navigate('/radicals')}>explore radicals</button>
           {!user && (
             <div className="hero-auth-row">
               <button className="btn" onClick={() => navigate('/auth')}>log in</button>

@@ -12,6 +12,11 @@ export default function Auth({ onAuth }) {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
+  const [showForgot, setShowForgot] = useState(false)
+  const [forgotEmail, setForgotEmail] = useState('')
+  const [forgotMessage, setForgotMessage] = useState(null)
+  const [forgotLoading, setForgotLoading] = useState(false)
+
   const submit = async () => {
     if (!username || !password) {
       setMessage({ type: 'error', text: 'Enter a username and password.' })
@@ -36,6 +41,66 @@ export default function Auth({ onAuth }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  const submitForgot = async () => {
+    if (!forgotEmail) {
+      setForgotMessage({ type: 'error', text: 'Enter your account email.' })
+      return
+    }
+    setForgotLoading(true)
+    setForgotMessage(null)
+    try {
+      const result = await api.forgotPassword(forgotEmail)
+      if (result.directResetLink) {
+        setForgotMessage({
+          type: 'success',
+          text: result.message,
+          link: result.directResetLink
+        })
+      } else {
+        setForgotMessage({ type: 'success', text: result.message })
+      }
+    } catch (e) {
+      setForgotMessage({ type: 'error', text: 'Could not reach the server. Try again.' })
+    } finally {
+      setForgotLoading(false)
+    }
+  }
+
+  if (showForgot) {
+    return (
+      <div className="page">
+        <div className="auth-card">
+          <h2 className="page-h" style={{ fontSize: 20, marginBottom: 6 }}>Reset your password</h2>
+          <p className="helper">Enter the email on your account and we'll send you a reset link.</p>
+          <div className="field">
+            <label>Email</label>
+            <input value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} placeholder="name@example.com" />
+          </div>
+          <button className="btn primary" style={{ width: '100%' }} onClick={submitForgot} disabled={forgotLoading}>
+            {forgotLoading ? 'Sending...' : 'Send reset link'}
+          </button>
+          {forgotMessage && (
+            <div className="auth-msg" style={{ color: forgotMessage.type === 'error' ? 'var(--crimson-bright)' : 'var(--teal)' }}>
+              {forgotMessage.text}
+              {forgotMessage.link && (
+                <div style={{ marginTop: 8 }}>
+                  <a href={forgotMessage.link} style={{ color: 'var(--gold-soft)', wordBreak: 'break-all' }}>
+                    {forgotMessage.link}
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
+          <div style={{ textAlign: 'center', marginTop: 16 }}>
+            <span className="auth-link" onClick={() => { setShowForgot(false); setForgotMessage(null) }}>
+              ← back to login
+            </span>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -65,6 +130,11 @@ export default function Auth({ onAuth }) {
         {message && (
           <div className="auth-msg" style={{ color: message.type === 'error' ? 'var(--crimson-bright)' : 'var(--teal)' }}>
             {message.text}
+          </div>
+        )}
+        {tab === 'login' && (
+          <div style={{ textAlign: 'center', marginTop: 14 }}>
+            <span className="auth-link" onClick={() => setShowForgot(true)}>Forgot password?</span>
           </div>
         )}
       </div>

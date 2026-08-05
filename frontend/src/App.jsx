@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Nav from './components/Nav.jsx'
+import RequireAuth from './components/RequireAuth.jsx'
+import WithWaves from './components/WithWaves.jsx'
+import PageWheelNav from './components/PageWheelNav.jsx'
 import Home from './pages/Home.jsx'
 import Auth from './pages/Auth.jsx'
+import ResetPassword from './pages/ResetPassword.jsx'
 import Radicals from './pages/Radicals.jsx'
 import Flashcards from './pages/Flashcards.jsx'
 import Quiz from './pages/Quiz.jsx'
@@ -34,17 +38,21 @@ export default function App() {
   return (
     <>
       <Nav user={user} onLogout={handleLogout} />
-      <Routes>
-        <Route path="/" element={<Home user={user} />} />
-        <Route path="/auth" element={<Auth onAuth={handleAuth} />} />
-        <Route path="/radicals" element={<Radicals />} />
-        <Route path="/flashcards" element={<Flashcards />} />
-        <Route path="/quiz" element={<Quiz user={user} onXpChange={setUser} />} />
-        <Route path="/timed" element={<Timed user={user} onXpChange={setUser} />} />
-        <Route path="/leaderboard" element={<Leaderboard />} />
-        <Route path="/stroke" element={<Stroke />} />
-        <Route path="/ai" element={<AiHelp />} />
-      </Routes>
+      {user && <PageWheelNav />}
+      <div className={user ? 'app-content with-wheel' : 'app-content'}>
+        <Routes>
+          <Route path="/" element={<Home user={user} />} />
+          <Route path="/auth" element={<WithWaves><Auth onAuth={handleAuth} /></WithWaves>} />
+          <Route path="/reset-password" element={<WithWaves><ResetPassword /></WithWaves>} />
+          <Route path="/radicals" element={<RequireAuth user={user}><WithWaves><Radicals /></WithWaves></RequireAuth>} />
+          <Route path="/flashcards" element={<RequireAuth user={user}><WithWaves><Flashcards /></WithWaves></RequireAuth>} />
+          <Route path="/quiz" element={<RequireAuth user={user}><WithWaves><Quiz user={user} onXpChange={setUser} /></WithWaves></RequireAuth>} />
+          <Route path="/timed" element={<RequireAuth user={user}><WithWaves><Timed user={user} onXpChange={setUser} /></WithWaves></RequireAuth>} />
+          <Route path="/leaderboard" element={<RequireAuth user={user}><WithWaves><Leaderboard /></WithWaves></RequireAuth>} />
+          <Route path="/stroke" element={<RequireAuth user={user}><WithWaves><Stroke /></WithWaves></RequireAuth>} />
+          <Route path="/ai" element={<RequireAuth user={user}><WithWaves><AiHelp /></WithWaves></RequireAuth>} />
+        </Routes>
+      </div>
     </>
   )
 }
