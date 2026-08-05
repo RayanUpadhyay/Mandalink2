@@ -28,7 +28,8 @@ public class DataSourceConfig {
         if (renderDatabaseUrl != null && renderDatabaseUrl.startsWith("postgres")) {
             URI uri = URI.create(renderDatabaseUrl);
             String[] userInfo = uri.getUserInfo().split(":", 2);
-            String jdbcUrl = "jdbc:postgresql://" + uri.getHost() + ":" + uri.getPort() + uri.getPath();
+            int port = uri.getPort() == -1 ? 5432 : uri.getPort();
+            String jdbcUrl = "jdbc:postgresql://" + uri.getHost() + ":" + port + uri.getPath();
 
             return DataSourceBuilder.create()
                 .url(jdbcUrl)
