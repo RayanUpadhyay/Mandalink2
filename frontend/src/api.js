@@ -46,5 +46,8 @@ export const api = {
     request('/api/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
 
   resetPassword: (token, newPassword) =>
-    request('/api/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, newPassword }) })
+    request('/api/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, newPassword }) }),
+
+  resetPasswordDirect: (username, email, newPassword) =>
+    request('/api/auth/reset-password-direct', { method: 'POST', body: JSON.stringify({ username, email, newPassword }) })
 }

@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 import SpecularButton from '../components/SpecularButton.jsx'
-import RippleDistortion from '../components/RippleDistortion/RippleDistortion.jsx'
 import { api } from '../api.js'
 import './Home.css'
 
@@ -16,7 +15,6 @@ export default function Home({ user }) {
   }, [])
 
   useEffect(() => {
-    if (!entered) return
     const hero = heroRef.current
     if (!hero) return
     const beams = []
@@ -38,17 +36,7 @@ export default function Home({ user }) {
   if (!entered) {
     return (
       <div className="page">
-        <div className="gate-screen">
-          <div className="gate-ripple-bg">
-            <RippleDistortion
-              src="/hero.jpg"
-              brushSize={150}
-              strength={0.2}
-              swirl={1}
-              rings={4}
-              grayscale
-            />
-          </div>
+        <div className="gate-screen beams-hero" ref={heroRef}>
           <div className="gate-btn-wrap">
             <SpecularButton onClick={() => setEntered(true)}>enter mandalink</SpecularButton>
           </div>

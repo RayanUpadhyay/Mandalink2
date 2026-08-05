@@ -16,4 +16,7 @@ public class AuthDtos {
 
     public record ResetPasswordRequest(String token, String newPassword) {}
     public record ResetPasswordResponse(boolean success, String message) {}
+
+    public record DirectResetRequest(String username, String email, String newPassword) {}
+    public record DirectResetResponse(boolean success, String message) {}
 }

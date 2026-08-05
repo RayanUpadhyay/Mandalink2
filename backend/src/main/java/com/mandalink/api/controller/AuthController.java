@@ -132,4 +132,26 @@ public class AuthController {
 
         return new ResetPasswordResponse(true, "Password reset. You can now log in with your new password.");
     }
+
+    @PostMapping("/reset-password-direct")
+    public DirectResetResponse resetPasswordDirect(@RequestBody DirectResetRequest req) {
+        if (req.username() == null || req.username().isBlank()
+                || req.email() == null || req.email().isBlank()) {
+            return new DirectResetResponse(false, "Enter your username and email.");
+        }
+        if (req.newPassword() == null || req.newPassword().length() < 4) {
+            return new DirectResetResponse(false, "Password must be at least 4 characters.");
+        }
+
+        var userOpt = userRepository.findByUsernameAndEmail(req.username(), req.email());
+        if (userOpt.isEmpty()) {
+            return new DirectResetResponse(false, "No account found with that username and email.");
+        }
+
+        User user = userOpt.get();
+        user.setPasswordHash(passwordEncoder.encode(req.newPassword()));
+        userRepository.save(user);
+
+        return new DirectResetResponse(true, "Password reset. You can now log in with your new password.");
+    }
 }
