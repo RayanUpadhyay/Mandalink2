@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api.js'
 import './Auth.css'
@@ -11,11 +11,64 @@ export default function Auth({ onAuth }) {
   const [message, setMessage] = useState(null)
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const googleBtnRef = useRef(null)
 
   const [showForgot, setShowForgot] = useState(false)
   const [forgotEmail, setForgotEmail] = useState('')
   const [forgotMessage, setForgotMessage] = useState(null)
   const [forgotLoading, setForgotLoading] = useState(false)
+
+  const handleGoogleCredential = async (response) => {
+    setMessage(null)
+    setLoading(true)
+    try {
+      const result = await api.googleAuth(response.credential)
+      if (result.success) {
+        onAuth(result.user, result.token)
+        setMessage({ type: 'success', text: result.message })
+        setTimeout(() => navigate('/'), 600)
+      } else {
+        setMessage({ type: 'error', text: result.message })
+      }
+    } catch (e) {
+      setMessage({ type: 'error', text: 'Could not reach the server. Try again.' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+    if (!clientId || showForgot) return
+
+    const renderButton = () => {
+      if (!window.google || !googleBtnRef.current) return
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleCredential
+      })
+      googleBtnRef.current.innerHTML = ''
+      window.google.accounts.id.renderButton(googleBtnRef.current, {
+        theme: 'outline',
+        size: 'large',
+        shape: 'pill',
+        width: 320
+      })
+    }
+
+    if (window.google) {
+      renderButton()
+    } else {
+      const interval = setInterval(() => {
+        if (window.google) {
+          clearInterval(interval)
+          renderButton()
+        }
+      }, 200)
+      return () => clearInterval(interval)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showForgot, tab])
 
   const submit = async () => {
     if (!username || !password) {
@@ -124,6 +177,10 @@ export default function Auth({ onAuth }) {
           {loading ? 'Please wait...' : tab === 'login' ? 'Login' : 'Create account'}
         </button>
         {message && <div className={`auth-msg ${message.type}`}>{message.text}</div>}
+
+        <div className="auth-divider"><span>or</span></div>
+        <div ref={googleBtnRef} className="google-btn-mount"></div>
+
         {tab === 'login' && (
           <div className="auth-footer-links">
             <span className="auth-link" onClick={() => setShowForgot(true)}>Forgot password?</span>
