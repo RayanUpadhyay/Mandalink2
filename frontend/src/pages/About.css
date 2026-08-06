@@ -10,9 +10,16 @@
   border-radius: 50%;
   object-fit: cover;
   border: 4px solid var(--blue);
-  margin: 0 auto 24px;
+  margin: 0 auto 12px;
   box-shadow: 0 6px 20px rgba(15, 108, 189, 0.2);
   background: var(--blue-soft);
+}
+.about-caption {
+  text-align: center;
+  color: var(--blue-dark);
+  font-weight: 700;
+  font-size: 16px;
+  margin: 0 0 24px;
 }
 .about-text {
   font-size: 16px;

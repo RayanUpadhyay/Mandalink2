@@ -27,7 +27,7 @@ export default function Nav({ user, onLogout }) {
     <div className="topnav">
       <div className="logo-group" onClick={() => go('/')}>
         <img src="/logo.png" alt="Mandalink logo" />
-        <span>mandalink</span>
+        <span className="logo-text">Mandalink</span>
       </div>
 
       <div className="nav-links">
