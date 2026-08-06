@@ -1,19 +1,37 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { api } from '../api.js'
 import './Flashcards.css'
 
+const WINDOW = 3 // how many cards to render on each side of the active one
+
 export default function Flashcards() {
   const [radicals, setRadicals] = useState([])
+  const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
   const [flipped, setFlipped] = useState(false)
 
   useEffect(() => {
-    api.getRadicals().then(data => setRadicals(data.slice(0, 20)))
+    api.getRadicals().then(setRadicals)
   }, [])
+
+  const filtered = useMemo(() => {
+    if (!query) return radicals
+    const q = query.toLowerCase()
+    return radicals.filter(r =>
+      r.character.includes(query) ||
+      r.pinyin.toLowerCase().includes(q) ||
+      r.meaning.toLowerCase().includes(q)
+    )
+  }, [radicals, query])
+
+  useEffect(() => {
+    setActive(0)
+    setFlipped(false)
+  }, [query])
 
   const move = (dir) => {
     setFlipped(false)
-    setActive(a => (a + dir + radicals.length) % radicals.length)
+    setActive(a => (a + dir + filtered.length) % filtered.length)
   }
 
   if (radicals.length === 0) {
@@ -25,49 +43,69 @@ export default function Flashcards() {
     )
   }
 
+  const visible = []
+  for (let offset = -WINDOW; offset <= WINDOW; offset++) {
+    const i = ((active + offset) % filtered.length + filtered.length) % filtered.length
+    if (filtered.length > WINDOW * 2 + 1 || visible.every(v => v.i !== i)) {
+      visible.push({ i, offset, r: filtered[i] })
+    }
+  }
+
   return (
     <div className="page">
       <h2 className="page-h">Flashcards</h2>
       <p className="helper">Click the card to flip it, or use the arrows to move through the deck.</p>
-      <div className="carousel-outer">
-        <div className="carousel-track">
-          {radicals.map((r, i) => {
-            let offset = i - active
-            if (offset > radicals.length / 2) offset -= radicals.length
-            if (offset < -radicals.length / 2) offset += radicals.length
-            const abs = Math.abs(offset)
-            const isActive = abs === 0
-            return (
-              <div
-                key={r.id}
-                className="flash-slide"
-                style={{
-                  transform: `translateX(${offset * 160}px) scale(${isActive ? 1 : 0.78}) rotateY(${offset * -22}deg)`,
-                  opacity: abs > 2 ? 0 : (isActive ? 1 : 0.5),
-                  zIndex: 10 - abs
-                }}
-                onClick={() => isActive ? setFlipped(f => !f) : setActive(i)}
-              >
-                <div className={`flip-inner ${isActive && flipped ? 'is-flipped' : ''}`}>
-                  <div className="flip-face flip-front">
-                    <div className="mn">{r.meaning}</div>
-                    <div className="tap-hint">tap to flip</div>
-                  </div>
-                  <div className="flip-face flip-back">
-                    <div className="ch">{r.character}</div>
-                    <div className="py">{r.pinyin}</div>
-                    <div className="tap-hint">tap to flip back</div>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+
+      <div className="search-bar">
+        <input
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Search by character, pinyin, or meaning..."
+        />
       </div>
-      <div className="carousel-nav">
-        <div className="nav-btn" onClick={() => move(-1)}>‹</div>
-        <div className="nav-btn" onClick={() => move(1)}>›</div>
-      </div>
+      <p className="helper" style={{ marginTop: -14 }}>
+        {filtered.length === 0 ? 'No matches' : `Card ${active + 1} of ${filtered.length}`}
+      </p>
+
+      {filtered.length === 0 ? null : (
+        <>
+          <div className="carousel-outer">
+            <div className="carousel-track">
+              {visible.map(({ i, offset, r }) => {
+                const isActive = offset === 0
+                return (
+                  <div
+                    key={r.id}
+                    className="flash-slide"
+                    style={{
+                      transform: `translateX(${offset * 160}px) scale(${isActive ? 1 : 0.78}) rotateY(${offset * -22}deg)`,
+                      opacity: Math.abs(offset) > 2 ? 0 : (isActive ? 1 : 0.5),
+                      zIndex: 10 - Math.abs(offset)
+                    }}
+                    onClick={() => isActive ? setFlipped(f => !f) : setActive(i)}
+                  >
+                    <div className={`flip-inner ${isActive && flipped ? 'is-flipped' : ''}`}>
+                      <div className="flip-face flip-front">
+                        <div className="mn">{r.meaning}</div>
+                        <div className="tap-hint">tap to flip</div>
+                      </div>
+                      <div className="flip-face flip-back">
+                        <div className="ch">{r.character}</div>
+                        <div className="py">{r.pinyin}</div>
+                        <div className="tap-hint">tap to flip back</div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+          <div className="carousel-nav">
+            <div className="nav-btn" onClick={() => move(-1)}>‹</div>
+            <div className="nav-btn" onClick={() => move(1)}>›</div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
