@@ -21,35 +21,64 @@ public class DataLoader implements CommandLineRunner {
         this.radicalRepository = radicalRepository;
     }
 
+    /**
+     * Minimal quote-aware CSV line splitter. Handles fields wrapped in double
+     * quotes that may themselves contain commas (e.g. "長 (镸, 长)"), which a
+     * naive line.split(",") would incorrectly break apart.
+     */
+    private List<String> parseCsvLine(String line) {
+        List<String> fields = new ArrayList<>();
+        StringBuilder field = new StringBuilder();
+        boolean inQuotes = false;
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (c == '"') {
+                inQuotes = !inQuotes;
+            } else if (c == ',' && !inQuotes) {
+                fields.add(field.toString());
+                field.setLength(0);
+            } else {
+                field.append(c);
+            }
+        }
+        fields.add(field.toString());
+        return fields;
+    }
+
     @Override
     public void run(String... args) throws Exception {
-        if (radicalRepository.count() > 0) {
-            return;
-        }
-
-        List<Radical> radicals = new ArrayList<>();
+        // Incremental import: only add rows whose radicalNo isn't already in the
+        // database, so growing radicals.csv over time and redeploying just works
+        // without needing to wipe the table first.
+        List<Radical> newRadicals = new ArrayList<>();
         ClassPathResource resource = new ClassPathResource("data/radicals.csv");
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
             String line = reader.readLine();
             while ((line = reader.readLine()) != null) {
                 if (line.isBlank()) continue;
-                String[] parts = line.split(",", -1);
-                if (parts.length < 4) continue;
+                List<String> parts = parseCsvLine(line);
+                if (parts.size() < 4) continue;
                 try {
-                    Integer no = parts[1].isBlank() ? null : Integer.parseInt(parts[1].trim());
-                    String character = parts[2].trim();
-                    String pinyin = parts[3].trim();
-                    String meaning = parts.length > 4 ? parts[4].trim() : "";
+                    String noRaw = parts.get(1).trim();
+                    Integer no = noRaw.isBlank() ? null : Integer.parseInt(noRaw);
+                    String character = parts.get(2).trim();
+                    String pinyin = parts.get(3).trim();
+                    String meaning = parts.size() > 4 ? parts.get(4).trim() : "";
                     if (character.isBlank()) continue;
-                    radicals.add(new Radical(no, character, pinyin, meaning));
+                    if (no != null && radicalRepository.existsByRadicalNo(no)) continue;
+                    newRadicals.add(new Radical(no, character, pinyin, meaning));
                 } catch (NumberFormatException ignored) {
                     // skip malformed row
                 }
             }
         }
 
-        radicalRepository.saveAll(radicals);
-        System.out.println("Loaded " + radicals.size() + " radicals into the database.");
+        if (!newRadicals.isEmpty()) {
+            radicalRepository.saveAll(newRadicals);
+            System.out.println("Loaded " + newRadicals.size() + " new radicals into the database.");
+        } else {
+            System.out.println("No new radicals to load — database already up to date.");
+        }
     }
 }

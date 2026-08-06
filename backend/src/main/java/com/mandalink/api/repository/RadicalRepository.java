@@ -8,4 +8,5 @@ public interface RadicalRepository extends JpaRepository<Radical, Long> {
     List<Radical> findByCharacterContainingOrPinyinContainingIgnoreCaseOrMeaningContainingIgnoreCase(
         String character, String pinyin, String meaning
     );
+    boolean existsByRadicalNo(Integer radicalNo);
 }
