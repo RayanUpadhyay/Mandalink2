@@ -99,3 +99,33 @@
   opacity: 0.5;
   cursor: default;
 }
+
+.admin-stat {
+  padding: 18px 22px;
+  min-width: 130px;
+  flex: 1;
+}
+.admin-stat .admin-stat-num {
+  font-size: 26px;
+}
+
+.admin-toppages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.admin-toppage-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 14px;
+  border-radius: 8px;
+  background: var(--bg);
+  font-size: 13.5px;
+}
+.admin-toppage-path {
+  font-weight: 600;
+  color: var(--text-hi);
+}
+.admin-toppage-count {
+  color: var(--text-low);
+}

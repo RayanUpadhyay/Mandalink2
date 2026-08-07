@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Nav from './components/Nav.jsx'
 import RequireAuth from './components/RequireAuth.jsx'
+import { api } from './api.js'
 import Home from './pages/Home.jsx'
 import Auth from './pages/Auth.jsx'
 import ForgotUsername from './pages/ForgotUsername.jsx'
@@ -19,11 +20,16 @@ import Admin from './pages/Admin.jsx'
 
 export default function App() {
   const [user, setUser] = useState(null)
+  const location = useLocation()
 
   useEffect(() => {
     const stored = localStorage.getItem('mandalink_user')
     if (stored) setUser(JSON.parse(stored))
   }, [])
+
+  useEffect(() => {
+    api.trackPageView(location.pathname)
+  }, [location.pathname])
 
   const handleAuth = (userSummary, token) => {
     setUser(userSummary)

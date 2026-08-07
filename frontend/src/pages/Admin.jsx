@@ -64,6 +64,18 @@ export default function Admin() {
           <div className="admin-stat-label">Registered users</div>
         </div>
         <div className="card admin-stat">
+          <div className="admin-stat-num">{data.activeUsers24h ?? 0}</div>
+          <div className="admin-stat-label">Active (24h)</div>
+        </div>
+        <div className="card admin-stat">
+          <div className="admin-stat-num">{data.activeUsers7d ?? 0}</div>
+          <div className="admin-stat-label">Active (7 days)</div>
+        </div>
+        <div className="card admin-stat">
+          <div className="admin-stat-num">{data.totalPageViews ?? 0}</div>
+          <div className="admin-stat-label">Total page views</div>
+        </div>
+        <div className="card admin-stat">
           <div className="admin-stat-num">{data.totalRadicals}</div>
           <div className="admin-stat-label">Total characters</div>
         </div>
@@ -71,6 +83,20 @@ export default function Admin() {
 
       {message && (
         <div className={`admin-msg ${message.type}`}>{message.text}</div>
+      )}
+
+      {data.topPages && data.topPages.length > 0 && (
+        <div className="card admin-table-card" style={{ marginBottom: 20 }}>
+          <h3 style={{ margin: '0 0 14px' }}>Most visited pages</h3>
+          <div className="admin-toppages-list">
+            {data.topPages.map(p => (
+              <div key={p.path} className="admin-toppage-row">
+                <span className="admin-toppage-path">{p.path === '/' ? 'Home' : p.path}</span>
+                <span className="admin-toppage-count">{p.views} views</span>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       <div className="card admin-table-card">
@@ -114,9 +140,9 @@ export default function Admin() {
       </div>
 
       <p className="helper admin-note">
-        Note: "active users," "time spent," and "most visited pages" aren't shown here because
-        that requires dedicated analytics tracking that isn't built yet — everything above is
-        real data pulled directly from the database.
+        "Active" counts unique visitors (by account, or by browser session if logged out) who
+        loaded at least one page in that window. Tracking started when this feature was added,
+        so historical data from before that isn't included.
       </p>
     </div>
   )

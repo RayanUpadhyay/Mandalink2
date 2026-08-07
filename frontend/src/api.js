@@ -79,5 +79,17 @@ export const api = {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       body: JSON.stringify({ userId, isAdmin })
     })
+  },
+
+  trackPageView: (path) => {
+    let sessionId = localStorage.getItem('mandalink_session_id')
+    if (!sessionId) {
+      sessionId = 'sess_' + Math.random().toString(36).slice(2) + Date.now().toString(36)
+      localStorage.setItem('mandalink_session_id', sessionId)
+    }
+    return request('/api/analytics/track', {
+      method: 'POST',
+      body: JSON.stringify({ sessionId, path })
+    }).catch(() => {}) // fire-and-forget — never let tracking break the app
   }
 }

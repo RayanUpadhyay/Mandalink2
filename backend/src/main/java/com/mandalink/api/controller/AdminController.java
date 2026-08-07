@@ -2,9 +2,11 @@ package com.mandalink.api.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mandalink.api.model.User;
+import com.mandalink.api.repository.PageViewRepository;
 import com.mandalink.api.repository.RadicalRepository;
 import com.mandalink.api.repository.UserRepository;
 import com.mandalink.api.service.JwtService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -16,19 +18,26 @@ public class AdminController {
 
     private final UserRepository userRepository;
     private final RadicalRepository radicalRepository;
+    private final PageViewRepository pageViewRepository;
     private final JwtService jwtService;
 
-    public AdminController(UserRepository userRepository, RadicalRepository radicalRepository, JwtService jwtService) {
+    public AdminController(UserRepository userRepository, RadicalRepository radicalRepository,
+                            PageViewRepository pageViewRepository, JwtService jwtService) {
         this.userRepository = userRepository;
         this.radicalRepository = radicalRepository;
+        this.pageViewRepository = pageViewRepository;
         this.jwtService = jwtService;
     }
 
     public record AdminUserRow(Long id, String username, String email, Integer xp, Integer level,
                                 String authProvider, LocalDateTime createdAt, @JsonProperty("isAdmin") Boolean isAdmin) {}
 
+    public record PagePopularity(String path, Long views) {}
+
     public record AdminStatsResponse(boolean authorized, String message, Long totalUsers,
-                                      Long totalRadicals, List<AdminUserRow> users) {}
+                                      Long totalRadicals, List<AdminUserRow> users,
+                                      Long activeUsers24h, Long activeUsers7d, Long totalPageViews,
+                                      List<PagePopularity> topPages) {}
 
     // Verifies the caller's JWT is valid AND that the account it belongs to
     // actually has isAdmin=true — never trusts a client-supplied username.
@@ -46,7 +55,7 @@ public class AdminController {
     public AdminStatsResponse stats(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         User admin = verifyAdmin(authHeader);
         if (admin == null) {
-            return new AdminStatsResponse(false, "Not authorized.", null, null, null);
+            return new AdminStatsResponse(false, "Not authorized.", null, null, null, null, null, null, null);
         }
 
         List<AdminUserRow> rows = userRepository.findAll().stream()
@@ -55,7 +64,16 @@ public class AdminController {
                 u.getAuthProvider(), u.getCreatedAt(), u.getIsAdmin()))
             .toList();
 
-        return new AdminStatsResponse(true, "OK", (long) rows.size(), radicalRepository.count(), rows);
+        LocalDateTime now = LocalDateTime.now();
+        long active24h = pageViewRepository.countDistinctActiveSince(now.minusHours(24));
+        long active7d = pageViewRepository.countDistinctActiveSince(now.minusDays(7));
+        long totalViews = pageViewRepository.count();
+        List<PagePopularity> topPages = pageViewRepository.topPaths(PageRequest.of(0, 8)).stream()
+            .map(p -> new PagePopularity(p.getPath(), p.getCnt()))
+            .toList();
+
+        return new AdminStatsResponse(true, "OK", (long) rows.size(), radicalRepository.count(), rows,
+            active24h, active7d, totalViews, topPages);
     }
 
     public record SetAdminRequest(Long userId, boolean isAdmin) {}
