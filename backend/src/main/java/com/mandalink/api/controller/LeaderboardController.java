@@ -47,12 +47,27 @@ public class LeaderboardController {
             .toList();
     }
 
+    // The Staff badge isn't claimed — it's tied directly to isAdmin, so it
+    // appears the instant someone is made admin and disappears the instant
+    // that's revoked. No manual action needed on either end.
+    private static final ClaimedBadge STAFF_BADGE =
+        new ClaimedBadge("🛠️", "Staff", "Behind the scenes, keeping Mandalink running");
+
+    private List<ClaimedBadge> badgesFor(User user, Map<Long, BadgeDrop> dropsById) {
+        List<ClaimedBadge> badges = new java.util.ArrayList<>();
+        if (Boolean.TRUE.equals(user.getIsAdmin())) {
+            badges.add(STAFF_BADGE);
+        }
+        badges.addAll(claimedBadgesFor(user.getId(), dropsById));
+        return badges;
+    }
+
     @GetMapping("/leaderboard")
     public List<UserSummary> leaderboard() {
         Map<Long, BadgeDrop> dropsById = allDropsById();
         return userRepository.findAllByOrderByXpDesc().stream()
             .map(u -> new UserSummary(u.getId(), u.getUsername(), u.getXp(), u.getLevel(), u.getIsAdmin(),
-                claimedBadgesFor(u.getId(), dropsById)))
+                badgesFor(u, dropsById)))
             .toList();
     }
 
@@ -66,6 +81,6 @@ public class LeaderboardController {
         user.setLevel(newLevel);
         userRepository.save(user);
         return new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel(), user.getIsAdmin(),
-            claimedBadgesFor(user.getId(), allDropsById()));
+            badgesFor(user, allDropsById()));
     }
 }
