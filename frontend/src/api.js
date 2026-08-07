@@ -65,12 +65,19 @@ export const api = {
   forgotUsername: (email) =>
     request('/api/auth/forgot-username', { method: 'POST', body: JSON.stringify({ email }) }),
 
-  getDueReview: (username) =>
-    request(`/api/progress/due?username=${encodeURIComponent(username)}`),
+  getAdminStats: () => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/admin/stats', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    })
+  },
 
-  submitReview: (username, radicalId, correct) =>
-    request('/api/progress/review', { method: 'POST', body: JSON.stringify({ username, radicalId, correct }) }),
-
-  getProgressSummary: (username) =>
-    request(`/api/progress/summary?username=${encodeURIComponent(username)}`)
+  setAdmin: (userId, isAdmin) => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/admin/set-admin', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: JSON.stringify({ userId, isAdmin })
+    })
+  }
 }
