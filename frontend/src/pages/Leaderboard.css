@@ -37,3 +37,47 @@
   margin-right: 2px;
   font-size: 14px;
 }
+
+.badge-hover-wrap {
+  position: relative;
+  display: inline-block;
+  cursor: default;
+}
+.badge-tooltip {
+  position: absolute;
+  bottom: 135%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text-hi);
+  color: #fff;
+  padding: 9px 13px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 20;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+.badge-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--text-hi);
+}
+.badge-tooltip-desc {
+  font-weight: 400;
+  color: #d8d4cd;
+  margin-top: 3px;
+  white-space: normal;
+  max-width: 220px;
+}
+.badge-hover-wrap:hover .badge-tooltip {
+  opacity: 1;
+  visibility: visible;
+}

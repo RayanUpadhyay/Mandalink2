@@ -43,7 +43,7 @@ public class LeaderboardController {
         return claims.stream()
             .map(c -> dropsById.get(c.getDropId()))
             .filter(d -> d != null)
-            .map(d -> new ClaimedBadge(d.getIcon(), d.getName()))
+            .map(d -> new ClaimedBadge(d.getIcon(), d.getName(), d.getDescription()))
             .toList();
     }
 
