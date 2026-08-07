@@ -26,7 +26,17 @@ export default function Leaderboard() {
             return (
               <div className={`lb-row ${i === 0 ? 'gold' : ''}`} key={u.id}>
                 <span className="lb-rank">{String(i + 1).padStart(2, '0')}</span>
-                <span className="lb-name">{badge && <span title={badge.label}>{badge.icon} </span>}{u.username}</span>
+                <span className="lb-name">
+                  {badge && <span title={badge.label}>{badge.icon} </span>}
+                  {u.username}
+                  {u.limitedBadges && u.limitedBadges.length > 0 && (
+                    <span className="lb-limited-badges">
+                      {u.limitedBadges.map((b, idx) => (
+                        <span key={idx} title={b.name} className="lb-limited-icon">{b.icon}</span>
+                      ))}
+                    </span>
+                  )}
+                </span>
                 <span className="lb-xp">{u.xp} xp · lvl {u.level}</span>
               </div>
             )

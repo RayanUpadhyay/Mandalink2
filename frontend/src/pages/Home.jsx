@@ -7,15 +7,60 @@ import './Home.css'
 
 const primaryChar = (character) => (character || '').split(' ')[0].trim()
 
+const formatCountdown = (seconds) => {
+  if (seconds <= 0) return 'Expired'
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  const s = Math.floor(seconds % 60)
+  return `${h}h ${m}m ${s}s`
+}
+
 export default function Home({ user }) {
   const navigate = useNavigate()
   const [radicalCount, setRadicalCount] = useState(null)
   const [cotd, setCotd] = useState(null)
+  const [drop, setDrop] = useState(null)
+  const [secondsLeft, setSecondsLeft] = useState(0)
+  const [claiming, setClaiming] = useState(false)
+  const [claimMessage, setClaimMessage] = useState(null)
 
   useEffect(() => {
     api.getRadicalCount().then(data => setRadicalCount(data.count)).catch(() => {})
     api.getRadicalOfTheDay().then(setCotd).catch(() => {})
   }, [])
+
+  useEffect(() => {
+    if (!user) return
+    api.getActiveBadgeDrop().then(data => {
+      setDrop(data)
+      setSecondsLeft(data.secondsRemaining || 0)
+    }).catch(() => {})
+  }, [user])
+
+  useEffect(() => {
+    if (!drop || !drop.hasActiveDrop) return
+    const interval = setInterval(() => {
+      setSecondsLeft(s => Math.max(0, s - 1))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [drop])
+
+  const claimDrop = async () => {
+    if (!drop) return
+    setClaiming(true)
+    setClaimMessage(null)
+    try {
+      const result = await api.claimBadgeDrop(drop.dropId)
+      setClaimMessage(result.message)
+      if (result.success) {
+        setDrop(d => ({ ...d, alreadyClaimed: true }))
+      }
+    } catch (e) {
+      setClaimMessage('Could not reach the server.')
+    } finally {
+      setClaiming(false)
+    }
+  }
 
   const badges = user ? earnedBadges(user.xp) : []
   const upNext = user ? nextBadge(user.xp) : null
@@ -63,6 +108,28 @@ export default function Home({ user }) {
               <button className="cotd-speak" onClick={() => speakChinese(primaryChar(cotd.character))}>🔊</button>
             )}
           </div>
+        </div>
+      )}
+
+      {user && drop && drop.hasActiveDrop && (
+        <div className="card drop-card">
+          <div className="cotd-label">⚡ Limited Edition — 24 Hours Only</div>
+          <div className="drop-row">
+            <div className="drop-icon">{drop.icon}</div>
+            <div className="drop-info">
+              <div className="drop-name">{drop.name}</div>
+              <div className="drop-desc">{drop.description}</div>
+              <div className="drop-countdown">Expires in {formatCountdown(secondsLeft)}</div>
+            </div>
+            {drop.alreadyClaimed ? (
+              <div className="drop-claimed">✓ Claimed</div>
+            ) : (
+              <button className="btn primary" disabled={claiming || secondsLeft <= 0} onClick={claimDrop}>
+                {claiming ? 'Claiming...' : 'Claim'}
+              </button>
+            )}
+          </div>
+          {claimMessage && <p className="helper" style={{ margin: '10px 0 0' }}>{claimMessage}</p>}
         </div>
       )}
 

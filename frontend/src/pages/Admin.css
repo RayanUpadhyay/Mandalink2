@@ -129,3 +129,35 @@
 .admin-toppage-count {
   color: var(--text-low);
 }
+
+.admin-active-drop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.admin-active-drop-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-drop-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.admin-drop-input {
+  flex: 1;
+  min-width: 140px;
+  border: 1.5px solid var(--panel-border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  font-family: inherit;
+}
+.admin-drop-input:focus {
+  outline: none;
+  border-color: var(--blue);
+}

@@ -1,6 +1,7 @@
 package com.mandalink.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 
 public class AuthDtos {
 
@@ -9,8 +10,10 @@ public class AuthDtos {
 
     public record AuthResponse(boolean success, String message, String token, UserSummary user) {}
 
+    public record ClaimedBadge(String icon, String name) {}
+
     public record UserSummary(Long id, String username, Integer xp, Integer level,
-                               @JsonProperty("isAdmin") Boolean isAdmin) {}
+                               @JsonProperty("isAdmin") Boolean isAdmin, List<ClaimedBadge> limitedBadges) {}
 
     public record XpUpdateRequest(Integer amount) {}
 

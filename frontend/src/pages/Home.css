@@ -175,3 +175,49 @@
 .badge-next {
   color: var(--text-low);
 }
+
+.drop-card {
+  margin-top: 20px;
+  padding: 22px 26px;
+  border: 1.5px solid var(--gold);
+  background: linear-gradient(135deg, #fffaf0, #ffffff);
+}
+.drop-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 12px;
+}
+.drop-icon {
+  font-size: 44px;
+  min-width: 56px;
+  text-align: center;
+}
+.drop-info {
+  flex: 1;
+}
+.drop-name {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-hi);
+}
+.drop-desc {
+  font-size: 13px;
+  color: var(--text-mid);
+  margin-top: 2px;
+}
+.drop-countdown {
+  font-size: 12px;
+  color: var(--gold);
+  font-weight: 700;
+  margin-top: 6px;
+}
+.drop-claimed {
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--blue-soft);
+  color: var(--blue-dark);
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+}

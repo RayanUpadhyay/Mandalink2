@@ -91,5 +91,27 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ sessionId, path })
     }).catch(() => {}) // fire-and-forget — never let tracking break the app
+  },
+
+  getActiveBadgeDrop: () => request('/api/badge-drops/active'),
+
+  claimBadgeDrop: (dropId) =>
+    request('/api/badge-drops/claim', { method: 'POST', body: JSON.stringify({ dropId }) }),
+
+  createBadgeDrop: (name, icon, description) => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/admin/badge-drops', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: JSON.stringify({ name, icon, description })
+    })
+  },
+
+  endBadgeDrop: () => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/admin/badge-drops/end', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    })
   }
 }

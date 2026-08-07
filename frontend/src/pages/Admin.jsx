@@ -8,6 +8,12 @@ export default function Admin() {
   const [busyId, setBusyId] = useState(null)
   const [message, setMessage] = useState(null)
 
+  const [dropName, setDropName] = useState('')
+  const [dropIcon, setDropIcon] = useState('')
+  const [dropDesc, setDropDesc] = useState('')
+  const [dropBusy, setDropBusy] = useState(false)
+  const [dropMessage, setDropMessage] = useState(null)
+
   const load = () => {
     api.getAdminStats()
       .then(setData)
@@ -28,6 +34,41 @@ export default function Admin() {
       setMessage({ type: 'error', text: 'Could not reach the server.' })
     } finally {
       setBusyId(null)
+    }
+  }
+
+  const submitDrop = async () => {
+    if (!dropName || !dropIcon) {
+      setDropMessage({ type: 'error', text: 'Name and icon are required.' })
+      return
+    }
+    setDropBusy(true)
+    setDropMessage(null)
+    try {
+      const result = await api.createBadgeDrop(dropName, dropIcon, dropDesc)
+      setDropMessage({ type: result.success ? 'success' : 'error', text: result.message })
+      if (result.success) {
+        setDropName(''); setDropIcon(''); setDropDesc('')
+        load()
+      }
+    } catch (e) {
+      setDropMessage({ type: 'error', text: 'Could not reach the server.' })
+    } finally {
+      setDropBusy(false)
+    }
+  }
+
+  const endDropNow = async () => {
+    setDropBusy(true)
+    setDropMessage(null)
+    try {
+      const result = await api.endBadgeDrop()
+      setDropMessage({ type: result.success ? 'success' : 'error', text: result.message })
+      if (result.success) load()
+    } catch (e) {
+      setDropMessage({ type: 'error', text: 'Could not reach the server.' })
+    } finally {
+      setDropBusy(false)
     }
   }
 
@@ -84,6 +125,53 @@ export default function Admin() {
       {message && (
         <div className={`admin-msg ${message.type}`}>{message.text}</div>
       )}
+
+      <div className="card admin-table-card" style={{ marginBottom: 20 }}>
+        <h3 style={{ margin: '0 0 14px' }}>Limited badge drop</h3>
+        {data.activeDrop ? (
+          <div className="admin-active-drop">
+            <div className="admin-active-drop-info">
+              <span style={{ fontSize: 24 }}>{data.activeDrop.icon}</span>
+              <div>
+                <div style={{ fontWeight: 700 }}>{data.activeDrop.name}</div>
+                <div className="helper" style={{ margin: 0 }}>{data.activeDrop.description}</div>
+              </div>
+            </div>
+            <button className="btn" disabled={dropBusy} onClick={endDropNow}>End drop now</button>
+          </div>
+        ) : (
+          <>
+            <p className="helper">No active drop. Create one — it'll be live for exactly 24 hours.</p>
+            <div className="admin-drop-form">
+              <input
+                className="admin-drop-input"
+                placeholder="Icon (emoji)"
+                value={dropIcon}
+                onChange={e => setDropIcon(e.target.value)}
+                style={{ maxWidth: 90 }}
+              />
+              <input
+                className="admin-drop-input"
+                placeholder="Badge name"
+                value={dropName}
+                onChange={e => setDropName(e.target.value)}
+              />
+              <input
+                className="admin-drop-input"
+                placeholder="Description (optional)"
+                value={dropDesc}
+                onChange={e => setDropDesc(e.target.value)}
+              />
+              <button className="btn primary" disabled={dropBusy} onClick={submitDrop}>
+                {dropBusy ? 'Creating...' : 'Launch drop'}
+              </button>
+            </div>
+          </>
+        )}
+        {dropMessage && (
+          <div className={`admin-msg ${dropMessage.type}`} style={{ marginTop: 12 }}>{dropMessage.text}</div>
+        )}
+      </div>
 
       {data.topPages && data.topPages.length > 0 && (
         <div className="card admin-table-card" style={{ marginBottom: 20 }}>
