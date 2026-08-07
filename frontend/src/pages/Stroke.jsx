@@ -170,6 +170,16 @@ export default function Stroke() {
                 {mode === 'demo' ? '▶ replay animation' : '↻ restart practice'}
               </button>
             )}
+            <div style={{ marginTop: 14 }}>
+              <a
+                href={`http://www.r12345.com/ziyuan/?char=${encodeURIComponent(primaryChar(selected.character))}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="etym-link"
+              >
+                View character origin (字源) →
+              </a>
+            </div>
             {quizMessage && <p className="quiz-msg">{quizMessage}</p>}
           </div>
         </div>
