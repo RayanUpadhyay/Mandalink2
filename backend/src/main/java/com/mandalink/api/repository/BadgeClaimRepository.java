@@ -7,4 +7,5 @@ import java.util.List;
 public interface BadgeClaimRepository extends JpaRepository<BadgeClaim, Long> {
     boolean existsByUserIdAndDropId(Long userId, Long dropId);
     List<BadgeClaim> findByUserId(Long userId);
+    void deleteByUserId(Long userId);
 }

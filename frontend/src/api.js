@@ -113,5 +113,13 @@ export const api = {
       method: 'POST',
       headers: token ? { Authorization: `Bearer ${token}` } : {}
     })
+  },
+
+  deleteUser: (userId) => {
+    const token = localStorage.getItem('mandalink_token')
+    return request(`/api/admin/users/${userId}`, {
+      method: 'DELETE',
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    })
   }
 }

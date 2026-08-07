@@ -23,6 +23,9 @@ export default function Admin() {
 
   useEffect(load, [])
 
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
+  const [deleteBusyId, setDeleteBusyId] = useState(null)
+
   const toggleAdmin = async (u) => {
     setBusyId(u.id)
     setMessage(null)
@@ -34,6 +37,21 @@ export default function Admin() {
       setMessage({ type: 'error', text: 'Could not reach the server.' })
     } finally {
       setBusyId(null)
+    }
+  }
+
+  const deleteUser = async (u) => {
+    setDeleteBusyId(u.id)
+    setMessage(null)
+    try {
+      const result = await api.deleteUser(u.id)
+      setMessage({ type: result.success ? 'success' : 'error', text: result.message })
+      setConfirmDeleteId(null)
+      if (result.success) load()
+    } catch (e) {
+      setMessage({ type: 'error', text: 'Could not reach the server.' })
+    } finally {
+      setDeleteBusyId(null)
     }
   }
 
@@ -200,6 +218,7 @@ export default function Admin() {
                 <th>Sign-in method</th>
                 <th>Joined</th>
                 <th>Admin</th>
+                <th>Delete</th>
               </tr>
             </thead>
             <tbody>
@@ -219,6 +238,27 @@ export default function Admin() {
                     >
                       {u.isAdmin ? '✓ Admin' : 'Grant admin'}
                     </button>
+                  </td>
+                  <td>
+                    {confirmDeleteId === u.id ? (
+                      <span className="admin-confirm-delete">
+                        <span className="admin-confirm-text">Delete {u.username}?</span>
+                        <button
+                          className="admin-toggle-btn admin-danger-btn"
+                          disabled={deleteBusyId === u.id}
+                          onClick={() => deleteUser(u)}
+                        >
+                          {deleteBusyId === u.id ? '...' : 'Yes, delete'}
+                        </button>
+                        <button className="admin-toggle-btn" onClick={() => setConfirmDeleteId(null)}>
+                          Cancel
+                        </button>
+                      </span>
+                    ) : (
+                      <button className="admin-toggle-btn admin-danger-btn" onClick={() => setConfirmDeleteId(u.id)}>
+                        Delete
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

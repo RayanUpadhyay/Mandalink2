@@ -3,6 +3,7 @@ package com.mandalink.api.controller;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mandalink.api.model.BadgeDrop;
 import com.mandalink.api.model.User;
+import com.mandalink.api.repository.BadgeClaimRepository;
 import com.mandalink.api.repository.BadgeDropRepository;
 import com.mandalink.api.repository.PageViewRepository;
 import com.mandalink.api.repository.RadicalRepository;
@@ -22,15 +23,17 @@ public class AdminController {
     private final RadicalRepository radicalRepository;
     private final PageViewRepository pageViewRepository;
     private final BadgeDropRepository badgeDropRepository;
+    private final BadgeClaimRepository badgeClaimRepository;
     private final JwtService jwtService;
 
     public AdminController(UserRepository userRepository, RadicalRepository radicalRepository,
                             PageViewRepository pageViewRepository, BadgeDropRepository badgeDropRepository,
-                            JwtService jwtService) {
+                            BadgeClaimRepository badgeClaimRepository, JwtService jwtService) {
         this.userRepository = userRepository;
         this.radicalRepository = radicalRepository;
         this.pageViewRepository = pageViewRepository;
         this.badgeDropRepository = badgeDropRepository;
+        this.badgeClaimRepository = badgeClaimRepository;
         this.jwtService = jwtService;
     }
 
@@ -155,5 +158,32 @@ public class AdminController {
         drop.setExpiresAt(LocalDateTime.now());
         badgeDropRepository.save(drop);
         return new CreateDropResponse(true, "Drop ended early.");
+    }
+
+    public record DeleteUserResponse(boolean success, String message) {}
+
+    @DeleteMapping("/users/{userId}")
+    public DeleteUserResponse deleteUser(@RequestHeader(value = "Authorization", required = false) String authHeader,
+                                          @PathVariable Long userId) {
+        User caller = verifyAdmin(authHeader);
+        if (caller == null) {
+            return new DeleteUserResponse(false, "Not authorized.");
+        }
+        if (caller.getId().equals(userId)) {
+            return new DeleteUserResponse(false, "You can't delete your own account from here.");
+        }
+        var targetOpt = userRepository.findById(userId);
+        if (targetOpt.isEmpty()) {
+            return new DeleteUserResponse(false, "User not found.");
+        }
+        User target = targetOpt.get();
+        String deletedUsername = target.getUsername();
+
+        // Clean up related data first — no real FK constraint would enforce
+        // this, so do it explicitly to avoid orphaned rows.
+        badgeClaimRepository.deleteByUserId(userId);
+        userRepository.delete(target);
+
+        return new DeleteUserResponse(true, "Deleted account: " + deletedUsername);
     }
 }

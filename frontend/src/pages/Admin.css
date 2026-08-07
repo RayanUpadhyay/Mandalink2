@@ -161,3 +161,22 @@
   outline: none;
   border-color: var(--blue);
 }
+
+.admin-danger-btn {
+  border-color: #c9503f;
+  color: #c9503f;
+}
+.admin-danger-btn:hover {
+  background: #fbeae7;
+}
+.admin-confirm-delete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.admin-confirm-text {
+  font-size: 12px;
+  color: var(--text-mid);
+  font-weight: 600;
+}
