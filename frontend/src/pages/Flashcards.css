@@ -91,3 +91,25 @@
   justify-content: center;
   cursor: pointer;
 }
+
+.card-speak-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--panel-border);
+  background: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-speak-btn:hover {
+  border-color: var(--blue);
+}
+.speak-btn {
+  font-size: 15px;
+}

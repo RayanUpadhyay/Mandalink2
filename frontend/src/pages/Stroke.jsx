@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import HanziWriter from 'hanzi-writer'
 import { api } from '../api.js'
+import { speakChinese, isSpeechSupported } from '../utils/speech.js'
 import './Stroke.css'
 
 const DATA_URL = char =>
@@ -155,8 +156,17 @@ export default function Stroke() {
               <span className={mode === 'demo' ? 'active' : ''} onClick={() => setMode('demo')}>Demo</span>
               <span className={mode === 'practice' ? 'active' : ''} onClick={() => setMode('practice')}>Practice</span>
             </div>
-            <p className="helper" style={{ marginBottom: 14 }}>
-              {selected.character} · {selected.pinyin} · {selected.meaning}
+            <p className="helper" style={{ marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span>{selected.character} · {selected.pinyin} · {selected.meaning}</span>
+              {isSpeechSupported() && (
+                <button
+                  className="etym-link"
+                  style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
+                  onClick={() => speakChinese(primaryChar(selected.character))}
+                >
+                  🔊
+                </button>
+              )}
             </p>
             <p className="helper" style={{ marginBottom: 14 }}>
               {dataUnavailable

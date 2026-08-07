@@ -1,8 +1,12 @@
 import { useState, useEffect, useMemo } from 'react'
 import { api } from '../api.js'
+import { speakChinese, isSpeechSupported } from '../utils/speech.js'
 import './Flashcards.css'
 
 const WINDOW = 3 // how many cards to render on each side of the active one
+
+// Some entries store compound forms like "長 (镸, 长)" — speak just the primary character.
+const primaryChar = (character) => (character || '').split(' ')[0].trim()
 
 export default function Flashcards() {
   const [radicals, setRadicals] = useState([])
@@ -88,11 +92,27 @@ export default function Flashcards() {
                       <div className="flip-face flip-front">
                         <div className="mn">{r.meaning}</div>
                         <div className="tap-hint">tap to flip</div>
+                        {isActive && isSpeechSupported() && (
+                          <button
+                            className="card-speak-btn"
+                            onClick={e => { e.stopPropagation(); speakChinese(primaryChar(r.character)) }}
+                          >
+                            🔊
+                          </button>
+                        )}
                       </div>
                       <div className="flip-face flip-back">
                         <div className="ch">{r.character}</div>
                         <div className="py">{r.pinyin}</div>
                         <div className="tap-hint">tap to flip back</div>
+                        {isActive && isSpeechSupported() && (
+                          <button
+                            className="card-speak-btn"
+                            onClick={e => { e.stopPropagation(); speakChinese(primaryChar(r.character)) }}
+                          >
+                            🔊
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -102,6 +122,15 @@ export default function Flashcards() {
           </div>
           <div className="carousel-nav">
             <div className="nav-btn" onClick={() => move(-1)}>‹</div>
+            {isSpeechSupported() && (
+              <div
+                className="nav-btn speak-btn"
+                onClick={() => speakChinese(primaryChar(filtered[active]?.character))}
+                title="Hear pronunciation"
+              >
+                🔊
+              </div>
+            )}
             <div className="nav-btn" onClick={() => move(1)}>›</div>
           </div>
         </>

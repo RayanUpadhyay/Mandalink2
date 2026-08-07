@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api.js'
+import { speakChinese, isSpeechSupported } from '../utils/speech.js'
+
+const primaryChar = (character) => (character || '').split(' ')[0].trim()
 
 export default function Radicals() {
   const [query, setQuery] = useState('')
@@ -40,7 +43,12 @@ export default function Radicals() {
       ) : (
         <div className="grid-4">
           {radicals.map(r => (
-            <div className="rad-tile" key={r.id}>
+            <div
+              className={`rad-tile ${isSpeechSupported() ? 'rad-tile-clickable' : ''}`}
+              key={r.id}
+              onClick={() => isSpeechSupported() && speakChinese(primaryChar(r.character))}
+              title={isSpeechSupported() ? 'Click to hear pronunciation' : undefined}
+            >
               <div className="ch">{r.character}</div>
               <div className="py">{r.pinyin}</div>
               <div className="mn">{r.meaning}</div>
