@@ -21,7 +21,7 @@ public class LeaderboardController {
     @GetMapping("/leaderboard")
     public List<UserSummary> leaderboard() {
         return userRepository.findAllByOrderByXpDesc().stream()
-            .map(u -> new UserSummary(u.getId(), u.getUsername(), u.getXp(), u.getLevel()))
+            .map(u -> new UserSummary(u.getId(), u.getUsername(), u.getXp(), u.getLevel(), u.getIsAdmin()))
             .toList();
     }
 
@@ -34,6 +34,6 @@ public class LeaderboardController {
         user.setXp(newXp);
         user.setLevel(newLevel);
         userRepository.save(user);
-        return new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel());
+        return new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel(), user.getIsAdmin());
     }
 }
