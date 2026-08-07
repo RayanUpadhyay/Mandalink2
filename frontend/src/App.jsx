@@ -14,6 +14,7 @@ import Timed from './pages/Timed.jsx'
 import Leaderboard from './pages/Leaderboard.jsx'
 import Stroke from './pages/Stroke.jsx'
 import AiHelp from './pages/AiHelp.jsx'
+import Worksheet from './pages/Worksheet.jsx'
 
 export default function App() {
   const [user, setUser] = useState(null)
@@ -51,6 +52,7 @@ export default function App() {
         <Route path="/leaderboard" element={<RequireAuth user={user}><Leaderboard /></RequireAuth>} />
         <Route path="/stroke" element={<RequireAuth user={user}><Stroke /></RequireAuth>} />
         <Route path="/ai" element={<RequireAuth user={user}><AiHelp /></RequireAuth>} />
+        <Route path="/worksheet" element={<RequireAuth user={user}><Worksheet /></RequireAuth>} />
       </Routes>
     </>
   )

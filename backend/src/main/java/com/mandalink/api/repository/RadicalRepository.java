@@ -9,4 +9,5 @@ public interface RadicalRepository extends JpaRepository<Radical, Long> {
         String character, String pinyin, String meaning
     );
     boolean existsByRadicalNo(Integer radicalNo);
+    List<Radical> findByRadicalNoBetween(Integer min, Integer max);
 }

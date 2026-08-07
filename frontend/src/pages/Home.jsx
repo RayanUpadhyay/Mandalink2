@@ -1,15 +1,24 @@
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { api } from '../api.js'
+import { speakChinese, isSpeechSupported } from '../utils/speech.js'
+import { earnedBadges, nextBadge } from '../utils/badges.js'
 import './Home.css'
+
+const primaryChar = (character) => (character || '').split(' ')[0].trim()
 
 export default function Home({ user }) {
   const navigate = useNavigate()
   const [radicalCount, setRadicalCount] = useState(null)
+  const [cotd, setCotd] = useState(null)
 
   useEffect(() => {
     api.getRadicalCount().then(data => setRadicalCount(data.count)).catch(() => {})
+    api.getRadicalOfTheDay().then(setCotd).catch(() => {})
   }, [])
+
+  const badges = user ? earnedBadges(user.xp) : []
+  const upNext = user ? nextBadge(user.xp) : null
 
   return (
     <div className="page">
@@ -40,6 +49,46 @@ export default function Home({ user }) {
           <p className="hero-count">{radicalCount} radicals ready to learn — free forever</p>
         )}
       </div>
+
+      {cotd && (
+        <div className="card cotd-card">
+          <div className="cotd-label">Character of the Day</div>
+          <div className="cotd-row">
+            <div className="cotd-char">{primaryChar(cotd.character)}</div>
+            <div className="cotd-info">
+              <div className="cotd-pinyin">{cotd.pinyin}</div>
+              <div className="cotd-meaning">{cotd.meaning}</div>
+            </div>
+            {isSpeechSupported() && (
+              <button className="cotd-speak" onClick={() => speakChinese(primaryChar(cotd.character))}>🔊</button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {user && (
+        <div className="card badges-card">
+          <div className="cotd-label">Your Achievements</div>
+          {badges.length === 0 ? (
+            <p className="helper" style={{ margin: '10px 0 0' }}>
+              Earn XP in Quiz or Timed Mode to unlock your first badge.
+            </p>
+          ) : (
+            <div className="badges-row">
+              {badges.map(b => (
+                <div key={b.label} className="badge-pill" title={`${b.label} — ${b.xp}+ XP`}>
+                  <span className="badge-icon">{b.icon}</span> {b.label}
+                </div>
+              ))}
+            </div>
+          )}
+          {upNext && (
+            <p className="helper badge-next" style={{ margin: '10px 0 0' }}>
+              {user.xp} / {upNext.xp} XP to {upNext.icon} {upNext.label}
+            </p>
+          )}
+        </div>
+      )}
 
       <div className="feat-grid">
         <div className="feat" onClick={() => navigate(user ? '/flashcards' : '/auth')}>

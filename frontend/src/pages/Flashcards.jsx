@@ -8,9 +8,19 @@ const WINDOW = 3 // how many cards to render on each side of the active one
 // Some entries store compound forms like "長 (镸, 长)" — speak just the primary character.
 const primaryChar = (character) => (character || '').split(' ')[0].trim()
 
+const TIERS = [
+  { value: '', label: 'All difficulty levels' },
+  { value: '1', label: 'Tier 1 — Core radicals (1–214)' },
+  { value: '2', label: 'Tier 2 — Most common (215–734)' },
+  { value: '3', label: 'Tier 3 — Common (735–1784)' },
+  { value: '4', label: 'Tier 4 — Advanced (1785–5000)' }
+]
+const TIER_RANGES = { '1': [1, 214], '2': [215, 734], '3': [735, 1784], '4': [1785, 5000] }
+
 export default function Flashcards() {
   const [radicals, setRadicals] = useState([])
   const [query, setQuery] = useState('')
+  const [tier, setTier] = useState('')
   const [active, setActive] = useState(0)
   const [flipped, setFlipped] = useState(false)
 
@@ -19,19 +29,26 @@ export default function Flashcards() {
   }, [])
 
   const filtered = useMemo(() => {
-    if (!query) return radicals
-    const q = query.toLowerCase()
-    return radicals.filter(r =>
-      r.character.includes(query) ||
-      r.pinyin.toLowerCase().includes(q) ||
-      r.meaning.toLowerCase().includes(q)
-    )
-  }, [radicals, query])
+    let list = radicals
+    if (tier && TIER_RANGES[tier]) {
+      const [min, max] = TIER_RANGES[tier]
+      list = list.filter(r => r.radicalNo != null && r.radicalNo >= min && r.radicalNo <= max)
+    }
+    if (query) {
+      const q = query.toLowerCase()
+      list = list.filter(r =>
+        r.character.includes(query) ||
+        r.pinyin.toLowerCase().includes(q) ||
+        r.meaning.toLowerCase().includes(q)
+      )
+    }
+    return list
+  }, [radicals, query, tier])
 
   useEffect(() => {
     setActive(0)
     setFlipped(false)
-  }, [query])
+  }, [query, tier])
 
   const move = (dir) => {
     setFlipped(false)
@@ -60,12 +77,17 @@ export default function Flashcards() {
       <h2 className="page-h">Flashcards</h2>
       <p className="helper">Click the card to flip it, or use the arrows to move through the deck.</p>
 
-      <div className="search-bar">
-        <input
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          placeholder="Search by character, pinyin, or meaning..."
-        />
+      <div className="filter-row">
+        <div className="search-bar" style={{ flex: 1, marginBottom: 0 }}>
+          <input
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Search by character, pinyin, or meaning..."
+          />
+        </div>
+        <select className="tier-select" value={tier} onChange={e => setTier(e.target.value)}>
+          {TIERS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+        </select>
       </div>
       <p className="helper" style={{ marginTop: -14 }}>
         {filtered.length === 0 ? 'No matches' : `Card ${active + 1} of ${filtered.length}`}

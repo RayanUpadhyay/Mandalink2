@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api.js'
+import { currentBadge } from '../utils/badges.js'
 import './Leaderboard.css'
 
 export default function Leaderboard() {
@@ -20,13 +21,16 @@ export default function Leaderboard() {
         <p className="helper">No users yet — be the first to earn XP!</p>
       ) : (
         <div>
-          {users.map((u, i) => (
-            <div className={`lb-row ${i === 0 ? 'gold' : ''}`} key={u.id}>
-              <span className="lb-rank">{String(i + 1).padStart(2, '0')}</span>
-              <span className="lb-name">{u.username}</span>
-              <span className="lb-xp">{u.xp} xp · lvl {u.level}</span>
-            </div>
-          ))}
+          {users.map((u, i) => {
+            const badge = currentBadge(u.xp)
+            return (
+              <div className={`lb-row ${i === 0 ? 'gold' : ''}`} key={u.id}>
+                <span className="lb-rank">{String(i + 1).padStart(2, '0')}</span>
+                <span className="lb-name">{badge && <span title={badge.label}>{badge.icon} </span>}{u.username}</span>
+                <span className="lb-xp">{u.xp} xp · lvl {u.level}</span>
+              </div>
+            )
+          })}
         </div>
       )}
     </div>

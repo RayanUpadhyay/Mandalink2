@@ -107,3 +107,27 @@
 .rad-tile-clickable {
   cursor: pointer;
 }
+
+.filter-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.tier-select {
+  background: #ffffff;
+  border: 1.5px solid var(--panel-border);
+  border-radius: 999px;
+  padding: 0 18px;
+  font-size: 14px;
+  color: var(--text-mid);
+  font-family: inherit;
+  cursor: pointer;
+}
+.tier-select:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+@media (max-width: 700px) {
+  .filter-row { flex-direction: column; }
+}

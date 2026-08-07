@@ -24,8 +24,16 @@ export const api = {
   login: (username, password) =>
     request('/api/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) }),
 
-  getRadicals: (q) =>
-    request(`/api/radicals${q ? `?q=${encodeURIComponent(q)}` : ''}`),
+  getRadicals: (q, tier) => {
+    const params = new URLSearchParams()
+    if (q) params.set('q', q)
+    if (tier) params.set('tier', tier)
+    const qs = params.toString()
+    return request(`/api/radicals${qs ? `?${qs}` : ''}`)
+  },
+
+  getRadicalOfTheDay: () =>
+    request('/api/radicals/of-the-day'),
 
   getRandomRadical: () =>
     request('/api/radicals/random'),
@@ -55,5 +63,14 @@ export const api = {
     request('/api/auth/google', { method: 'POST', body: JSON.stringify({ idToken }) }),
 
   forgotUsername: (email) =>
-    request('/api/auth/forgot-username', { method: 'POST', body: JSON.stringify({ email }) })
+    request('/api/auth/forgot-username', { method: 'POST', body: JSON.stringify({ email }) }),
+
+  getDueReview: (username) =>
+    request(`/api/progress/due?username=${encodeURIComponent(username)}`),
+
+  submitReview: (username, radicalId, correct) =>
+    request('/api/progress/review', { method: 'POST', body: JSON.stringify({ username, radicalId, correct }) }),
+
+  getProgressSummary: (username) =>
+    request(`/api/progress/summary?username=${encodeURIComponent(username)}`)
 }

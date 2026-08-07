@@ -11,6 +11,7 @@ const LINKS = [
   { to: '/leaderboard', label: 'Leaderboard' },
   { to: '/stroke', label: 'Stroke Order' },
   { to: '/ai', label: 'AI Help' },
+  { to: '/worksheet', label: 'Worksheet' },
   { to: '/about', label: 'About' }
 ]
 

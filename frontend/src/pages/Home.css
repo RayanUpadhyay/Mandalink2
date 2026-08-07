@@ -103,3 +103,75 @@
   .hero-h { font-size: 34px; }
   .feat-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+.cotd-card, .badges-card {
+  margin-top: 20px;
+  padding: 24px 28px;
+}
+.cotd-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-low);
+  font-weight: 700;
+}
+.cotd-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 12px;
+}
+.cotd-char {
+  font-size: 52px;
+  font-weight: 700;
+  color: var(--blue);
+  min-width: 70px;
+}
+.cotd-info {
+  flex: 1;
+}
+.cotd-pinyin {
+  font-size: 14px;
+  color: var(--text-low);
+}
+.cotd-meaning {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-hi);
+}
+.cotd-speak {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid var(--panel-border);
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 16px;
+}
+.cotd-speak:hover {
+  border-color: var(--blue);
+}
+
+.badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+.badge-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--blue-soft);
+  color: var(--blue-dark);
+  font-size: 13px;
+  font-weight: 700;
+}
+.badge-icon {
+  font-size: 15px;
+}
+.badge-next {
+  color: var(--text-low);
+}
