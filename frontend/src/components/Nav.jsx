@@ -19,6 +19,8 @@ export default function Nav({ user, onLogout }) {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
 
+  const links = user && user.isAdmin ? [...LINKS, { to: '/admin', label: 'Admin' }] : LINKS
+
   const go = (path) => {
     setMenuOpen(false)
     navigate(path)
@@ -32,7 +34,7 @@ export default function Nav({ user, onLogout }) {
       </div>
 
       <div className="nav-links">
-        {LINKS.map(link => (
+        {links.map(link => (
           <NavLink key={link.to} to={link.to} end={link.to === '/'} className={({ isActive }) => isActive ? 'active' : ''}>
             {link.label}
           </NavLink>
@@ -52,7 +54,7 @@ export default function Nav({ user, onLogout }) {
 
       {menuOpen && (
         <div className="mobile-menu">
-          {LINKS.map(link => (
+          {links.map(link => (
             <div key={link.to} className="mobile-menu-link" onClick={() => go(link.to)}>
               {link.label}
             </div>
