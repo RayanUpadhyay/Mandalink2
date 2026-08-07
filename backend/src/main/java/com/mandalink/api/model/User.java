@@ -38,6 +38,9 @@ public class User {
     @Column(name = "auth_provider")
     private String authProvider = "local";
 
+    @Column(name = "is_admin")
+    private Boolean isAdmin = false;
+
     public User() {}
 
     public Long getId() { return id; }
@@ -69,4 +72,7 @@ public class User {
 
     public String getAuthProvider() { return authProvider; }
     public void setAuthProvider(String authProvider) { this.authProvider = authProvider; }
+
+    public Boolean getIsAdmin() { return isAdmin; }
+    public void setIsAdmin(Boolean isAdmin) { this.isAdmin = isAdmin; }
 }
