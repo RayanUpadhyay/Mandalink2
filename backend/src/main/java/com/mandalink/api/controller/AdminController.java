@@ -1,5 +1,6 @@
 package com.mandalink.api.controller;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mandalink.api.model.User;
 import com.mandalink.api.repository.RadicalRepository;
 import com.mandalink.api.repository.UserRepository;
@@ -24,7 +25,7 @@ public class AdminController {
     }
 
     public record AdminUserRow(Long id, String username, String email, Integer xp, Integer level,
-                                String authProvider, LocalDateTime createdAt, Boolean isAdmin) {}
+                                String authProvider, LocalDateTime createdAt, @JsonProperty("isAdmin") Boolean isAdmin) {}
 
     public record AdminStatsResponse(boolean authorized, String message, Long totalUsers,
                                       Long totalRadicals, List<AdminUserRow> users) {}
