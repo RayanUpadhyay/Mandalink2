@@ -22,6 +22,9 @@ public class UserController {
     private final ModerationService moderationService;
 
     private static final int MAX_BIO_LENGTH = 300;
+    // Data URI strings are ~33% larger than the raw image bytes they encode.
+    // This caps the raw image at roughly 300KB.
+    private static final int MAX_AVATAR_DATA_URI_LENGTH = 400_000;
 
     public UserController(UserRepository userRepository, BadgeService badgeService, JwtService jwtService,
                            ModerationService moderationService) {
@@ -46,7 +49,8 @@ public class UserController {
     }
 
     public record ProfileResponse(boolean success, String message, Long id, String username, String email,
-                                   Integer xp, Integer level, String avatar, String bio, Boolean isAdmin,
+                                   Integer xp, Integer level, String avatar, String avatarImage,
+                                   Boolean hasPendingAvatar, String bio, Boolean isAdmin,
                                    Integer rank, Integer totalUsers, List<ClaimedBadge> badges,
                                    LocalDateTime createdAt) {}
 
@@ -55,7 +59,7 @@ public class UserController {
         User user = userFromToken(authHeader);
         if (user == null) {
             return new ProfileResponse(false, "Not logged in.", null, null, null, null, null,
-                null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null, null);
         }
 
         List<User> ranked = userRepository.findAllByOrderByXpDesc();
@@ -68,14 +72,16 @@ public class UserController {
         }
 
         return new ProfileResponse(true, "OK", user.getId(), user.getUsername(), user.getEmail(),
-            user.getXp(), user.getLevel(), user.getAvatar(), user.getBio(), user.getIsAdmin(),
+            user.getXp(), user.getLevel(), user.getAvatar(), user.getAvatarImage(),
+            user.getPendingAvatarImage() != null, user.getBio(), user.getIsAdmin(),
             rank, ranked.size(), badgeService.badgesFor(user), user.getCreatedAt());
     }
 
     // Public view of someone ELSE's profile — no auth required (same info
-    // already visible on the leaderboard), but deliberately excludes email.
+    // already visible on the leaderboard), but deliberately excludes email
+    // AND never exposes a pending (unapproved) image.
     public record PublicProfileResponse(boolean success, String message, String username, String avatar,
-                                         String bio, Integer xp, Integer level, Boolean isAdmin,
+                                         String avatarImage, String bio, Integer xp, Integer level, Boolean isAdmin,
                                          Integer rank, Integer totalUsers, List<ClaimedBadge> badges,
                                          LocalDateTime createdAt) {}
 
@@ -83,7 +89,7 @@ public class UserController {
     public PublicProfileResponse publicProfile(@PathVariable String username) {
         var userOpt = userRepository.findByUsername(username);
         if (userOpt.isEmpty()) {
-            return new PublicProfileResponse(false, "User not found.", null, null, null, null, null, null, null, null, null, null);
+            return new PublicProfileResponse(false, "User not found.", null, null, null, null, null, null, null, null, null, null, null);
         }
         User user = userOpt.get();
 
@@ -96,8 +102,8 @@ public class UserController {
             }
         }
 
-        return new PublicProfileResponse(true, "OK", user.getUsername(), user.getAvatar(), user.getBio(),
-            user.getXp(), user.getLevel(), user.getIsAdmin(),
+        return new PublicProfileResponse(true, "OK", user.getUsername(), user.getAvatar(), user.getAvatarImage(),
+            user.getBio(), user.getXp(), user.getLevel(), user.getIsAdmin(),
             rank, ranked.size(), badgeService.badgesFor(user), user.getCreatedAt());
     }
 
@@ -152,8 +158,40 @@ public class UserController {
             return new ChangeAvatarResponse(false, "Not a valid avatar option.");
         }
         user.setAvatar(req.avatar());
+        // Switching to a preset drops any approved custom photo — it's an
+        // explicit choice to go back to presets, not just a display toggle.
+        user.setAvatarImage(null);
         userRepository.save(user);
         return new ChangeAvatarResponse(true, "Avatar updated.");
+    }
+
+    public record UploadAvatarRequest(String imageDataUri) {}
+    public record UploadAvatarResponse(boolean success, String message) {}
+
+    @PostMapping("/upload-avatar")
+    public UploadAvatarResponse uploadAvatar(@RequestHeader(value = "Authorization", required = false) String authHeader,
+                                              @RequestBody UploadAvatarRequest req) {
+        User user = userFromToken(authHeader);
+        if (user == null) {
+            return new UploadAvatarResponse(false, "Not logged in.");
+        }
+        String dataUri = req.imageDataUri();
+        if (dataUri == null || dataUri.isBlank()) {
+            return new UploadAvatarResponse(false, "No image provided.");
+        }
+        if (!dataUri.startsWith("data:image/")) {
+            return new UploadAvatarResponse(false, "That doesn't look like a valid image.");
+        }
+        if (dataUri.length() > MAX_AVATAR_DATA_URI_LENGTH) {
+            return new UploadAvatarResponse(false, "Image is too large — please use a smaller photo.");
+        }
+
+        user.setPendingAvatarImage(dataUri);
+        user.setPendingAvatarSubmittedAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        return new UploadAvatarResponse(true,
+            "Submitted! Your photo will appear once an admin reviews it.");
     }
 
     public record ChangeBioRequest(String bio) {}

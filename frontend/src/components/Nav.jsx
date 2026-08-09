@@ -46,7 +46,9 @@ export default function Nav({ user, onLogout }) {
         {user ? (
           <>
             <button className="signin-btn nav-profile-btn" onClick={() => go('/profile')}>
-              <span className="nav-avatar">{avatarEmoji(user.avatar)}</span> {user.username}
+              <span className="nav-avatar">
+                {user.avatarImage ? <img src={user.avatarImage} alt="" className="nav-avatar-img" /> : avatarEmoji(user.avatar)}
+              </span> {user.username}
             </button>
             <button className="signin-btn" onClick={onLogout}>Log out</button>
           </>

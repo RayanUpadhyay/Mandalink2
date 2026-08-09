@@ -44,6 +44,20 @@ public class User {
     @Column
     private String avatar = "panda";
 
+    // Approved custom photo, stored as a full data URI. Null means "use the
+    // preset emoji avatar above instead."
+    @Column(columnDefinition = "TEXT")
+    private String avatarImage;
+
+    // Newly uploaded photo awaiting admin review. Kept separate from
+    // avatarImage so the old approved photo (if any) keeps showing while a
+    // resubmission is pending, instead of going blank.
+    @Column(columnDefinition = "TEXT")
+    private String pendingAvatarImage;
+
+    @Column(name = "pending_avatar_submitted_at")
+    private LocalDateTime pendingAvatarSubmittedAt;
+
     @Column(columnDefinition = "TEXT")
     private String bio = "";
 
@@ -84,6 +98,15 @@ public class User {
 
     public String getAvatar() { return avatar; }
     public void setAvatar(String avatar) { this.avatar = avatar; }
+
+    public String getAvatarImage() { return avatarImage; }
+    public void setAvatarImage(String avatarImage) { this.avatarImage = avatarImage; }
+
+    public String getPendingAvatarImage() { return pendingAvatarImage; }
+    public void setPendingAvatarImage(String pendingAvatarImage) { this.pendingAvatarImage = pendingAvatarImage; }
+
+    public LocalDateTime getPendingAvatarSubmittedAt() { return pendingAvatarSubmittedAt; }
+    public void setPendingAvatarSubmittedAt(LocalDateTime pendingAvatarSubmittedAt) { this.pendingAvatarSubmittedAt = pendingAvatarSubmittedAt; }
 
     public String getBio() { return bio; }
     public void setBio(String bio) { this.bio = bio; }

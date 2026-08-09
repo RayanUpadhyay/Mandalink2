@@ -239,4 +239,63 @@ public class AdminController {
         return new GrantBadgeResponse(true,
             "Granted " + drop.getIcon() + " " + drop.getName() + " to " + target.getUsername() + ".");
     }
+
+    public record PendingAvatarRow(Long userId, String username, String imageDataUri, LocalDateTime submittedAt) {}
+    public record PendingAvatarsResponse(boolean success, List<PendingAvatarRow> pending) {}
+
+    @GetMapping("/pending-avatars")
+    public PendingAvatarsResponse pendingAvatars(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        User admin = verifyAdmin(authHeader);
+        if (admin == null) {
+            return new PendingAvatarsResponse(false, null);
+        }
+        List<PendingAvatarRow> rows = userRepository.findAll().stream()
+            .filter(u -> u.getPendingAvatarImage() != null)
+            .map(u -> new PendingAvatarRow(u.getId(), u.getUsername(), u.getPendingAvatarImage(), u.getPendingAvatarSubmittedAt()))
+            .toList();
+        return new PendingAvatarsResponse(true, rows);
+    }
+
+    public record AvatarModerationRequest(Long userId) {}
+    public record AvatarModerationResponse(boolean success, String message) {}
+
+    @PostMapping("/approve-avatar")
+    public AvatarModerationResponse approveAvatar(@RequestHeader(value = "Authorization", required = false) String authHeader,
+                                                    @RequestBody AvatarModerationRequest req) {
+        User admin = verifyAdmin(authHeader);
+        if (admin == null) {
+            return new AvatarModerationResponse(false, "Not authorized.");
+        }
+        var targetOpt = userRepository.findById(req.userId());
+        if (targetOpt.isEmpty()) {
+            return new AvatarModerationResponse(false, "User not found.");
+        }
+        User target = targetOpt.get();
+        if (target.getPendingAvatarImage() == null) {
+            return new AvatarModerationResponse(false, "No pending photo for that user.");
+        }
+        target.setAvatarImage(target.getPendingAvatarImage());
+        target.setPendingAvatarImage(null);
+        target.setPendingAvatarSubmittedAt(null);
+        userRepository.save(target);
+        return new AvatarModerationResponse(true, "Approved " + target.getUsername() + "'s photo.");
+    }
+
+    @PostMapping("/reject-avatar")
+    public AvatarModerationResponse rejectAvatar(@RequestHeader(value = "Authorization", required = false) String authHeader,
+                                                   @RequestBody AvatarModerationRequest req) {
+        User admin = verifyAdmin(authHeader);
+        if (admin == null) {
+            return new AvatarModerationResponse(false, "Not authorized.");
+        }
+        var targetOpt = userRepository.findById(req.userId());
+        if (targetOpt.isEmpty()) {
+            return new AvatarModerationResponse(false, "User not found.");
+        }
+        User target = targetOpt.get();
+        target.setPendingAvatarImage(null);
+        target.setPendingAvatarSubmittedAt(null);
+        userRepository.save(target);
+        return new AvatarModerationResponse(true, "Rejected " + target.getUsername() + "'s photo.");
+    }
 }

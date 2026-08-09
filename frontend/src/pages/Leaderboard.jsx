@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api.js'
 import { currentBadge } from '../utils/badges.js'
+import { avatarEmoji } from '../utils/avatars.js'
 import BadgeIcon from '../components/BadgeIcon.jsx'
 import './Leaderboard.css'
 
@@ -29,6 +30,9 @@ export default function Leaderboard() {
             return (
               <div className={`lb-row ${i === 0 ? 'gold' : ''}`} key={u.id}>
                 <span className="lb-rank">{String(i + 1).padStart(2, '0')}</span>
+                <span className="lb-pfp-circle" onClick={() => navigate(`/profile/${u.username}`)}>
+                  {u.avatarImage ? <img src={u.avatarImage} alt="" className="lb-pfp-img" /> : avatarEmoji(u.avatar)}
+                </span>
                 <span className="lb-name">
                   <span className="lb-name-link" onClick={() => navigate(`/profile/${u.username}`)}>
                     {u.username}

@@ -144,3 +144,11 @@
 .nav-avatar {
   font-size: 14px;
 }
+
+.nav-avatar-img {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  object-fit: cover;
+  vertical-align: middle;
+}

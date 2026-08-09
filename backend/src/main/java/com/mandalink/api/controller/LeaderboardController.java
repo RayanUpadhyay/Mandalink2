@@ -26,7 +26,7 @@ public class LeaderboardController {
         var dropsById = badgeService.allDropsById();
         return userRepository.findAllByOrderByXpDesc().stream()
             .map(u -> new UserSummary(u.getId(), u.getUsername(), u.getXp(), u.getLevel(), u.getIsAdmin(),
-                badgeService.badgesFor(u, dropsById), u.getAvatar()))
+                badgeService.badgesFor(u, dropsById), u.getAvatar(), u.getAvatarImage()))
             .toList();
     }
 
@@ -40,6 +40,6 @@ public class LeaderboardController {
         user.setLevel(newLevel);
         userRepository.save(user);
         return new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel(), user.getIsAdmin(),
-            badgeService.badgesFor(user), user.getAvatar());
+            badgeService.badgesFor(user), user.getAvatar(), user.getAvatarImage());
     }
 }

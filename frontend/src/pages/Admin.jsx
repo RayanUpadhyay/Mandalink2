@@ -38,6 +38,32 @@ export default function Admin() {
     }).catch(() => {})
   }, [])
 
+  const [pendingAvatars, setPendingAvatars] = useState([])
+  const [avatarModBusyId, setAvatarModBusyId] = useState(null)
+  const [avatarModMessage, setAvatarModMessage] = useState(null)
+
+  const loadPendingAvatars = () => {
+    api.getPendingAvatars().then(res => {
+      if (res.success) setPendingAvatars(res.pending)
+    }).catch(() => {})
+  }
+
+  useEffect(loadPendingAvatars, [])
+
+  const handleAvatarMod = async (userId, approve) => {
+    setAvatarModBusyId(userId)
+    setAvatarModMessage(null)
+    try {
+      const result = approve ? await api.approveAvatar(userId) : await api.rejectAvatar(userId)
+      setAvatarModMessage({ type: result.success ? 'success' : 'error', text: result.message })
+      if (result.success) loadPendingAvatars()
+    } catch (e) {
+      setAvatarModMessage({ type: 'error', text: 'Could not reach the server.' })
+    } finally {
+      setAvatarModBusyId(null)
+    }
+  }
+
   const toggleAdmin = async (u) => {
     setBusyId(u.id)
     setMessage(null)
@@ -172,6 +198,44 @@ export default function Admin() {
 
       {message && (
         <div className={`admin-msg ${message.type}`}>{message.text}</div>
+      )}
+
+      {pendingAvatars.length > 0 && (
+        <div className="card admin-table-card" style={{ marginBottom: 20 }}>
+          <h3 style={{ margin: '0 0 14px' }}>Pending profile photos ({pendingAvatars.length})</h3>
+          {avatarModMessage && (
+            <div className={`admin-msg ${avatarModMessage.type}`} style={{ marginBottom: 12 }}>{avatarModMessage.text}</div>
+          )}
+          <div className="pending-avatar-list">
+            {pendingAvatars.map(p => (
+              <div key={p.userId} className="pending-avatar-row">
+                <img src={p.imageDataUri} alt="" className="pending-avatar-img" />
+                <div className="pending-avatar-info">
+                  <div style={{ fontWeight: 700 }}>{p.username}</div>
+                  <div className="helper" style={{ margin: 0 }}>
+                    {p.submittedAt ? new Date(p.submittedAt).toLocaleString() : ''}
+                  </div>
+                </div>
+                <div className="pending-avatar-actions">
+                  <button
+                    className="admin-toggle-btn is-admin"
+                    disabled={avatarModBusyId === p.userId}
+                    onClick={() => handleAvatarMod(p.userId, true)}
+                  >
+                    ✓ Approve
+                  </button>
+                  <button
+                    className="admin-toggle-btn admin-danger-btn"
+                    disabled={avatarModBusyId === p.userId}
+                    onClick={() => handleAvatarMod(p.userId, false)}
+                  >
+                    ✗ Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       <div className="card admin-table-card" style={{ marginBottom: 20 }}>

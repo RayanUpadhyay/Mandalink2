@@ -180,3 +180,31 @@
   color: var(--text-mid);
   font-weight: 600;
 }
+
+.pending-avatar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pending-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--bg);
+}
+.pending-avatar-img {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--panel-border);
+}
+.pending-avatar-info {
+  flex: 1;
+}
+.pending-avatar-actions {
+  display: flex;
+  gap: 8px;
+}

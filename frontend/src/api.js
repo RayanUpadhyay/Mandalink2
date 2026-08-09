@@ -160,6 +160,40 @@ export const api = {
     })
   },
 
+  uploadAvatar: (imageDataUri) => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/users/upload-avatar', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: JSON.stringify({ imageDataUri })
+    })
+  },
+
+  getPendingAvatars: () => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/admin/pending-avatars', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    })
+  },
+
+  approveAvatar: (userId) => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/admin/approve-avatar', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: JSON.stringify({ userId })
+    })
+  },
+
+  rejectAvatar: (userId) => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/admin/reject-avatar', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: JSON.stringify({ userId })
+    })
+  },
+
   getAllBadgeDrops: () => {
     const token = localStorage.getItem('mandalink_token')
     return request('/api/admin/badge-drops/all', {

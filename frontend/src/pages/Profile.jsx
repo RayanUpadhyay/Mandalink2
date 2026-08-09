@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { api } from '../api.js'
 import { AVATARS, avatarEmoji } from '../utils/avatars.js'
+import { resizeImageFile } from '../utils/imageResize.js'
 import BadgeIcon from '../components/BadgeIcon.jsx'
 import './Profile.css'
 
@@ -19,6 +20,8 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
 
   const [showAvatarPicker, setShowAvatarPicker] = useState(false)
   const [avatarBusy, setAvatarBusy] = useState(false)
+  const [uploadMessage, setUploadMessage] = useState(null)
+  const fileInputRef = useRef(null)
 
   const [editingBio, setEditingBio] = useState(false)
   const [newBio, setNewBio] = useState('')
@@ -60,10 +63,31 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
     try {
       const result = await api.changeAvatar(id)
       if (result.success) {
-        onAvatarChanged(id)
+        onAvatarChanged(id, null)
         setShowAvatarPicker(false)
         load()
       }
+    } finally {
+      setAvatarBusy(false)
+    }
+  }
+
+  const handleFileSelect = async (e) => {
+    const file = e.target.files && e.target.files[0]
+    if (!file) return
+    e.target.value = '' // allow re-selecting the same file later
+    setAvatarBusy(true)
+    setUploadMessage(null)
+    try {
+      const dataUri = await resizeImageFile(file)
+      const result = await api.uploadAvatar(dataUri)
+      setUploadMessage({ type: result.success ? 'success' : 'error', text: result.message })
+      if (result.success) {
+        setShowAvatarPicker(false)
+        load()
+      }
+    } catch (err) {
+      setUploadMessage({ type: 'error', text: 'Could not process that image.' })
     } finally {
       setAvatarBusy(false)
     }
@@ -122,7 +146,11 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
               onClick={() => isOwnProfile && setShowAvatarPicker(s => !s)}
               style={{ cursor: isOwnProfile ? 'pointer' : 'default' }}
             >
-              {avatarEmoji(profile.avatar)}
+              {profile.avatarImage ? (
+                <img src={profile.avatarImage} alt="" className="profile-avatar-img" />
+              ) : (
+                avatarEmoji(profile.avatar)
+              )}
             </div>
             {isOwnProfile && <span className="profile-avatar-edit">Change</span>}
           </div>
@@ -161,18 +189,46 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
           </div>
         </div>
 
+        {isOwnProfile && profile.hasPendingAvatar && (
+          <div className="profile-pending-notice">
+            📷 Your uploaded photo is awaiting admin review — your current avatar still shows until then.
+          </div>
+        )}
+
         {isOwnProfile && showAvatarPicker && (
-          <div className="avatar-picker">
-            {Object.entries(AVATARS).map(([id, emoji]) => (
-              <button
-                key={id}
-                className={`avatar-option ${profile.avatar === id ? 'selected' : ''}`}
-                disabled={avatarBusy}
-                onClick={() => pickAvatar(id)}
-              >
-                {emoji}
+          <div className="avatar-picker-section">
+            <div className="avatar-picker">
+              {Object.entries(AVATARS).map(([id, emoji]) => (
+                <button
+                  key={id}
+                  className={`avatar-option ${!profile.avatarImage && profile.avatar === id ? 'selected' : ''}`}
+                  disabled={avatarBusy}
+                  onClick={() => pickAvatar(id)}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+            <div className="avatar-upload-row">
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                style={{ display: 'none' }}
+              />
+              <button className="btn" disabled={avatarBusy} onClick={() => fileInputRef.current.click()}>
+                {avatarBusy ? 'Working...' : '📷 Upload your own photo'}
               </button>
-            ))}
+              <span className="helper" style={{ margin: '6px 0 0' }}>
+                Photos are reviewed by an admin before they go live.
+              </span>
+            </div>
+            {uploadMessage && (
+              <p className={`helper ${uploadMessage.type === 'error' ? 'profile-error-text' : ''}`} style={{ margin: '8px 0 0' }}>
+                {uploadMessage.text}
+              </p>
+            )}
           </div>
         )}
 

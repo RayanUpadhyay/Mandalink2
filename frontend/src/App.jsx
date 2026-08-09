@@ -55,9 +55,9 @@ export default function App() {
     localStorage.setItem('mandalink_token', newToken)
   }
 
-  const handleAvatarChanged = (newAvatar) => {
+  const handleAvatarChanged = (newAvatar, newAvatarImage) => {
     setUser(u => {
-      const updated = { ...u, avatar: newAvatar }
+      const updated = { ...u, avatar: newAvatar, avatarImage: newAvatarImage ?? null }
       localStorage.setItem('mandalink_user', JSON.stringify(updated))
       return updated
     })
