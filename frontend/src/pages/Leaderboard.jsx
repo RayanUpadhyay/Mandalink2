@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { api } from '../api.js'
 import { currentBadge } from '../utils/badges.js'
-import { avatarEmoji } from '../utils/avatars.js'
 import BadgeIcon from '../components/BadgeIcon.jsx'
 import './Leaderboard.css'
 
 export default function Leaderboard() {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
   useEffect(() => {
     api.getLeaderboard().then(setUsers).catch(() => setUsers([])).finally(() => setLoading(false))
@@ -28,9 +29,10 @@ export default function Leaderboard() {
             return (
               <div className={`lb-row ${i === 0 ? 'gold' : ''}`} key={u.id}>
                 <span className="lb-rank">{String(i + 1).padStart(2, '0')}</span>
-                <span className="lb-avatar">{avatarEmoji(u.avatar)}</span>
                 <span className="lb-name">
-                  {u.username}
+                  <span className="lb-name-link" onClick={() => navigate(`/profile/${u.username}`)}>
+                    {u.username}
+                  </span>
                   <span className="lb-all-badges">
                     {badge && (
                       <BadgeIcon icon={badge.icon} name={badge.label} description={`Earned by reaching ${badge.xp}+ XP`} />

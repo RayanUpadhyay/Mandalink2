@@ -66,6 +66,35 @@ public class UserController {
             rank, ranked.size(), badgeService.badgesFor(user), user.getCreatedAt());
     }
 
+    // Public view of someone ELSE's profile — no auth required (same info
+    // already visible on the leaderboard), but deliberately excludes email.
+    public record PublicProfileResponse(boolean success, String message, String username, String avatar,
+                                         Integer xp, Integer level, Boolean isAdmin,
+                                         Integer rank, Integer totalUsers, List<ClaimedBadge> badges,
+                                         LocalDateTime createdAt) {}
+
+    @GetMapping("/profile/{username}")
+    public PublicProfileResponse publicProfile(@PathVariable String username) {
+        var userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            return new PublicProfileResponse(false, "User not found.", null, null, null, null, null, null, null, null, null);
+        }
+        User user = userOpt.get();
+
+        List<User> ranked = userRepository.findAllByOrderByXpDesc();
+        int rank = 1;
+        for (int i = 0; i < ranked.size(); i++) {
+            if (ranked.get(i).getId().equals(user.getId())) {
+                rank = i + 1;
+                break;
+            }
+        }
+
+        return new PublicProfileResponse(true, "OK", user.getUsername(), user.getAvatar(),
+            user.getXp(), user.getLevel(), user.getIsAdmin(),
+            rank, ranked.size(), badgeService.badgesFor(user), user.getCreatedAt());
+    }
+
     public record ChangeUsernameRequest(String newUsername) {}
     public record ChangeUsernameResponse(boolean success, String message, String newToken) {}
 

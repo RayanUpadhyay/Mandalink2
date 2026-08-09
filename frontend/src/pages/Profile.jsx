@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import { api } from '../api.js'
 import { AVATARS, avatarEmoji } from '../utils/avatars.js'
 import BadgeIcon from '../components/BadgeIcon.jsx'
 import './Profile.css'
 
-export default function Profile({ onUsernameChanged, onAvatarChanged }) {
+export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
+  const { username: routeUsername } = useParams()
+  const isOwnProfile = !routeUsername || (user && routeUsername.toLowerCase() === user.username.toLowerCase())
+
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -17,13 +21,15 @@ export default function Profile({ onUsernameChanged, onAvatarChanged }) {
   const [avatarBusy, setAvatarBusy] = useState(false)
 
   const load = () => {
-    api.getMyProfile()
+    setLoading(true)
+    const request = isOwnProfile ? api.getMyProfile() : api.getPublicProfile(routeUsername)
+    request
       .then(setProfile)
       .catch(() => setProfile({ success: false }))
       .finally(() => setLoading(false))
   }
 
-  useEffect(load, [])
+  useEffect(load, [routeUsername])
 
   const submitUsername = async () => {
     setUsernameBusy(true)
@@ -71,27 +77,35 @@ export default function Profile({ onUsernameChanged, onAvatarChanged }) {
     return (
       <div className="page">
         <h2 className="page-h">Profile</h2>
-        <p className="helper">Could not load your profile. Try refreshing.</p>
+        <p className="helper">
+          {isOwnProfile ? 'Could not load your profile. Try refreshing.' : "That user doesn't exist."}
+        </p>
       </div>
     )
   }
 
   return (
     <div className="page">
-      <h2 className="page-h">Profile</h2>
-      <p className="helper">Your Mandalink identity, badges, and standing.</p>
+      <h2 className="page-h">{isOwnProfile ? 'Profile' : `${profile.username}'s Profile`}</h2>
+      <p className="helper">
+        {isOwnProfile ? 'Your Mandalink identity, badges, and standing.' : 'Badges and standing on Mandalink.'}
+      </p>
 
       <div className="card profile-card">
         <div className="profile-header">
           <div className="profile-avatar-wrap">
-            <div className="profile-avatar" onClick={() => setShowAvatarPicker(s => !s)}>
+            <div
+              className="profile-avatar"
+              onClick={() => isOwnProfile && setShowAvatarPicker(s => !s)}
+              style={{ cursor: isOwnProfile ? 'pointer' : 'default' }}
+            >
               {avatarEmoji(profile.avatar)}
             </div>
-            <span className="profile-avatar-edit">Change</span>
+            {isOwnProfile && <span className="profile-avatar-edit">Change</span>}
           </div>
 
           <div className="profile-header-info">
-            {editingUsername ? (
+            {isOwnProfile && editingUsername ? (
               <div className="profile-username-edit">
                 <input
                   className="profile-input"
@@ -110,19 +124,21 @@ export default function Profile({ onUsernameChanged, onAvatarChanged }) {
             ) : (
               <div className="profile-username-row">
                 <span className="profile-username">{profile.username}</span>
-                <button className="btn" onClick={() => { setEditingUsername(true); setNewUsername(profile.username) }}>
-                  Edit
-                </button>
+                {isOwnProfile && (
+                  <button className="btn" onClick={() => { setEditingUsername(true); setNewUsername(profile.username) }}>
+                    Edit
+                  </button>
+                )}
               </div>
             )}
             {usernameMessage && (
               <p className="helper" style={{ color: '#b3372a', margin: '6px 0 0' }}>{usernameMessage.text}</p>
             )}
-            <p className="helper" style={{ margin: '4px 0 0' }}>{profile.email}</p>
+            {isOwnProfile && <p className="helper" style={{ margin: '4px 0 0' }}>{profile.email}</p>}
           </div>
         </div>
 
-        {showAvatarPicker && (
+        {isOwnProfile && showAvatarPicker && (
           <div className="avatar-picker">
             {Object.entries(AVATARS).map(([id, emoji]) => (
               <button
@@ -166,7 +182,9 @@ export default function Profile({ onUsernameChanged, onAvatarChanged }) {
           </div>
         ) : (
           <p className="helper" style={{ margin: 0 }}>
-            No badges yet — earn XP or catch a limited-time drop to start your collection.
+            {isOwnProfile
+              ? 'No badges yet — earn XP or catch a limited-time drop to start your collection.'
+              : 'No badges yet.'}
           </p>
         )}
       </div>

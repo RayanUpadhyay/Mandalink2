@@ -86,6 +86,11 @@ export default function App() {
             <Profile user={user} onUsernameChanged={handleUsernameChanged} onAvatarChanged={handleAvatarChanged} />
           </RequireAuth>
         } />
+        <Route path="/profile/:username" element={
+          <RequireAuth user={user}>
+            <Profile user={user} onUsernameChanged={handleUsernameChanged} onAvatarChanged={handleAvatarChanged} />
+          </RequireAuth>
+        } />
       </Routes>
     </>
   )

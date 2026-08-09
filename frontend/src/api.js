@@ -130,6 +130,9 @@ export const api = {
     })
   },
 
+  getPublicProfile: (username) =>
+    request(`/api/users/profile/${encodeURIComponent(username)}`),
+
   changeUsername: (newUsername) => {
     const token = localStorage.getItem('mandalink_token')
     return request('/api/users/change-username', {
