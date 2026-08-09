@@ -44,6 +44,9 @@ public class User {
     @Column
     private String avatar = "panda";
 
+    @Column(columnDefinition = "TEXT")
+    private String bio = "";
+
     public User() {}
 
     public Long getId() { return id; }
@@ -81,4 +84,7 @@ public class User {
 
     public String getAvatar() { return avatar; }
     public void setAvatar(String avatar) { this.avatar = avatar; }
+
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
 }

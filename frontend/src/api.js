@@ -151,6 +151,15 @@ export const api = {
     })
   },
 
+  changeBio: (bio) => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/users/change-bio', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: JSON.stringify({ bio })
+    })
+  },
+
   getAllBadgeDrops: () => {
     const token = localStorage.getItem('mandalink_token')
     return request('/api/admin/badge-drops/all', {

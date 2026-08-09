@@ -131,3 +131,22 @@
     grid-template-columns: repeat(5, 1fr);
   }
 }
+
+.profile-bio-text {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--text-mid);
+  margin: 0;
+  white-space: pre-wrap;
+}
+.profile-bio-textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 90px;
+}
+.profile-bio-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}

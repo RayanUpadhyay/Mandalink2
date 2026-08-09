@@ -20,6 +20,11 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
   const [showAvatarPicker, setShowAvatarPicker] = useState(false)
   const [avatarBusy, setAvatarBusy] = useState(false)
 
+  const [editingBio, setEditingBio] = useState(false)
+  const [newBio, setNewBio] = useState('')
+  const [bioBusy, setBioBusy] = useState(false)
+  const [bioMessage, setBioMessage] = useState(null)
+
   const load = () => {
     setLoading(true)
     const request = isOwnProfile ? api.getMyProfile() : api.getPublicProfile(routeUsername)
@@ -61,6 +66,24 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
       }
     } finally {
       setAvatarBusy(false)
+    }
+  }
+
+  const submitBio = async () => {
+    setBioBusy(true)
+    setBioMessage(null)
+    try {
+      const result = await api.changeBio(newBio)
+      if (result.success) {
+        setEditingBio(false)
+        load()
+      } else {
+        setBioMessage({ type: 'error', text: result.message })
+      }
+    } catch (e) {
+      setBioMessage({ type: 'error', text: 'Could not reach the server.' })
+    } finally {
+      setBioBusy(false)
     }
   }
 
@@ -167,6 +190,53 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
             <div className="profile-stat-label">Level</div>
           </div>
         </div>
+      </div>
+
+      <div className="card profile-card" style={{ marginTop: 20 }}>
+        <h3 style={{ margin: '0 0 14px' }}>About</h3>
+        {isOwnProfile && editingBio ? (
+          <div>
+            <textarea
+              className="profile-input profile-bio-textarea"
+              value={newBio}
+              onChange={e => setNewBio(e.target.value)}
+              placeholder="Tell other learners a bit about yourself..."
+              maxLength={300}
+              rows={4}
+            />
+            <div className="profile-bio-footer">
+              <span className="helper" style={{ margin: 0 }}>{newBio.length}/300</span>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button className="btn" onClick={() => { setEditingBio(false); setBioMessage(null) }}>Cancel</button>
+                <button className="btn primary" disabled={bioBusy} onClick={submitBio}>
+                  {bioBusy ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+            </div>
+            {bioMessage && (
+              <p className="helper" style={{ color: '#b3372a', margin: '6px 0 0' }}>{bioMessage.text}</p>
+            )}
+          </div>
+        ) : (
+          <>
+            {profile.bio ? (
+              <p className="profile-bio-text">{profile.bio}</p>
+            ) : (
+              <p className="helper" style={{ margin: 0 }}>
+                {isOwnProfile ? "You haven't written a bio yet." : `${profile.username} hasn't written a bio yet.`}
+              </p>
+            )}
+            {isOwnProfile && (
+              <button
+                className="btn"
+                style={{ marginTop: 12 }}
+                onClick={() => { setEditingBio(true); setNewBio(profile.bio || ''); setBioMessage(null) }}
+              >
+                {profile.bio ? 'Edit bio' : 'Add a bio'}
+              </button>
+            )}
+          </>
+        )}
       </div>
 
       <div className="card profile-card" style={{ marginTop: 20 }}>

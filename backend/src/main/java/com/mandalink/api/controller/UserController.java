@@ -5,6 +5,7 @@ import com.mandalink.api.model.User;
 import com.mandalink.api.repository.UserRepository;
 import com.mandalink.api.service.BadgeService;
 import com.mandalink.api.service.JwtService;
+import com.mandalink.api.service.ModerationService;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -18,11 +19,16 @@ public class UserController {
     private final UserRepository userRepository;
     private final BadgeService badgeService;
     private final JwtService jwtService;
+    private final ModerationService moderationService;
 
-    public UserController(UserRepository userRepository, BadgeService badgeService, JwtService jwtService) {
+    private static final int MAX_BIO_LENGTH = 300;
+
+    public UserController(UserRepository userRepository, BadgeService badgeService, JwtService jwtService,
+                           ModerationService moderationService) {
         this.userRepository = userRepository;
         this.badgeService = badgeService;
         this.jwtService = jwtService;
+        this.moderationService = moderationService;
     }
 
     // Fixed, server-validated set of preset avatars — no free-text input accepted,
@@ -40,7 +46,7 @@ public class UserController {
     }
 
     public record ProfileResponse(boolean success, String message, Long id, String username, String email,
-                                   Integer xp, Integer level, String avatar, Boolean isAdmin,
+                                   Integer xp, Integer level, String avatar, String bio, Boolean isAdmin,
                                    Integer rank, Integer totalUsers, List<ClaimedBadge> badges,
                                    LocalDateTime createdAt) {}
 
@@ -49,7 +55,7 @@ public class UserController {
         User user = userFromToken(authHeader);
         if (user == null) {
             return new ProfileResponse(false, "Not logged in.", null, null, null, null, null,
-                null, null, null, null, null, null);
+                null, null, null, null, null, null, null);
         }
 
         List<User> ranked = userRepository.findAllByOrderByXpDesc();
@@ -62,14 +68,14 @@ public class UserController {
         }
 
         return new ProfileResponse(true, "OK", user.getId(), user.getUsername(), user.getEmail(),
-            user.getXp(), user.getLevel(), user.getAvatar(), user.getIsAdmin(),
+            user.getXp(), user.getLevel(), user.getAvatar(), user.getBio(), user.getIsAdmin(),
             rank, ranked.size(), badgeService.badgesFor(user), user.getCreatedAt());
     }
 
     // Public view of someone ELSE's profile — no auth required (same info
     // already visible on the leaderboard), but deliberately excludes email.
     public record PublicProfileResponse(boolean success, String message, String username, String avatar,
-                                         Integer xp, Integer level, Boolean isAdmin,
+                                         String bio, Integer xp, Integer level, Boolean isAdmin,
                                          Integer rank, Integer totalUsers, List<ClaimedBadge> badges,
                                          LocalDateTime createdAt) {}
 
@@ -77,7 +83,7 @@ public class UserController {
     public PublicProfileResponse publicProfile(@PathVariable String username) {
         var userOpt = userRepository.findByUsername(username);
         if (userOpt.isEmpty()) {
-            return new PublicProfileResponse(false, "User not found.", null, null, null, null, null, null, null, null, null);
+            return new PublicProfileResponse(false, "User not found.", null, null, null, null, null, null, null, null, null, null);
         }
         User user = userOpt.get();
 
@@ -90,7 +96,7 @@ public class UserController {
             }
         }
 
-        return new PublicProfileResponse(true, "OK", user.getUsername(), user.getAvatar(),
+        return new PublicProfileResponse(true, "OK", user.getUsername(), user.getAvatar(), user.getBio(),
             user.getXp(), user.getLevel(), user.getIsAdmin(),
             rank, ranked.size(), badgeService.badgesFor(user), user.getCreatedAt());
     }
@@ -111,6 +117,10 @@ public class UserController {
         }
         if (!newUsername.matches("^[a-zA-Z0-9_]+$")) {
             return new ChangeUsernameResponse(false, "Username can only contain letters, numbers, and underscores.", null);
+        }
+        var moderation = moderationService.checkText(newUsername);
+        if (!moderation.allowed()) {
+            return new ChangeUsernameResponse(false, "Please choose an appropriate username.", null);
         }
         if (newUsername.equalsIgnoreCase(user.getUsername())) {
             return new ChangeUsernameResponse(false, "That's already your username.", null);
@@ -144,5 +154,28 @@ public class UserController {
         user.setAvatar(req.avatar());
         userRepository.save(user);
         return new ChangeAvatarResponse(true, "Avatar updated.");
+    }
+
+    public record ChangeBioRequest(String bio) {}
+    public record ChangeBioResponse(boolean success, String message) {}
+
+    @PostMapping("/change-bio")
+    public ChangeBioResponse changeBio(@RequestHeader(value = "Authorization", required = false) String authHeader,
+                                        @RequestBody ChangeBioRequest req) {
+        User user = userFromToken(authHeader);
+        if (user == null) {
+            return new ChangeBioResponse(false, "Not logged in.");
+        }
+        String bio = req.bio() == null ? "" : req.bio().trim();
+        if (bio.length() > MAX_BIO_LENGTH) {
+            return new ChangeBioResponse(false, "Bio must be " + MAX_BIO_LENGTH + " characters or fewer.");
+        }
+        var moderation = moderationService.checkText(bio);
+        if (!moderation.allowed()) {
+            return new ChangeBioResponse(false, moderation.reason());
+        }
+        user.setBio(bio);
+        userRepository.save(user);
+        return new ChangeBioResponse(true, "Bio updated.");
     }
 }

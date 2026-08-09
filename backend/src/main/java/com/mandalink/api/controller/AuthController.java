@@ -5,6 +5,7 @@ import com.mandalink.api.model.User;
 import com.mandalink.api.repository.UserRepository;
 import com.mandalink.api.service.EmailService;
 import com.mandalink.api.service.JwtService;
+import com.mandalink.api.service.ModerationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final EmailService emailService;
+    private final ModerationService moderationService;
 
     @Value("${app.frontend-base-url:https://mandalink.org}")
     private String frontendBaseUrl;
@@ -30,11 +32,12 @@ public class AuthController {
     private String googleClientId;
 
     public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                           JwtService jwtService, EmailService emailService) {
+                           JwtService jwtService, EmailService emailService, ModerationService moderationService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.emailService = emailService;
+        this.moderationService = moderationService;
     }
 
     @PostMapping("/register")
@@ -46,6 +49,10 @@ public class AuthController {
         }
         if (req.password().length() < 4) {
             return new AuthResponse(false, "Password must be at least 4 characters", null, null);
+        }
+        var moderation = moderationService.checkText(req.username());
+        if (!moderation.allowed()) {
+            return new AuthResponse(false, "Please choose an appropriate username.", null, null);
         }
         if (userRepository.existsByUsername(req.username())) {
             return new AuthResponse(false, "Username already exists", null, null);
