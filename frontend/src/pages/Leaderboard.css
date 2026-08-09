@@ -30,7 +30,7 @@
   color: var(--text-low);
 }
 
-.lb-all-badges {
+.lb-featured-badge {
   margin-left: 8px;
   display: inline-flex;
   gap: 4px;

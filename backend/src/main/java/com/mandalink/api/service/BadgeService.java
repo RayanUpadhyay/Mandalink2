@@ -13,6 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// Handles the ORIGINAL badge systems: the Staff badge (tied to isAdmin) and
+// admin-created limited-time drops. The new 8 collectible achievements live
+// in AchievementService instead — kept separate on purpose, same as the
+// product design keeps them conceptually separate.
 @Service
 public class BadgeService {
 
@@ -20,7 +24,7 @@ public class BadgeService {
     private final BadgeDropRepository badgeDropRepository;
 
     private static final ClaimedBadge STAFF_BADGE =
-        new ClaimedBadge("🛠️", "Staff", "Behind the scenes, keeping Mandalink running");
+        new ClaimedBadge("staff", "🛠️", "Staff", "Behind the scenes, keeping Mandalink running");
 
     public BadgeService(BadgeClaimRepository badgeClaimRepository, BadgeDropRepository badgeDropRepository) {
         this.badgeClaimRepository = badgeClaimRepository;
@@ -40,7 +44,7 @@ public class BadgeService {
         return claims.stream()
             .map(c -> dropsById.get(c.getDropId()))
             .filter(d -> d != null)
-            .map(d -> new ClaimedBadge(d.getIcon(), d.getName(), d.getDescription()))
+            .map(d -> new ClaimedBadge("drop:" + d.getId(), d.getIcon(), d.getName(), d.getDescription()))
             .toList();
     }
 

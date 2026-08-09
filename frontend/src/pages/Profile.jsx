@@ -28,6 +28,13 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
   const [bioBusy, setBioBusy] = useState(false)
   const [bioMessage, setBioMessage] = useState(null)
 
+  // New achievement system state — kept entirely separate from XP/level/rank.
+  const [achievementsData, setAchievementsData] = useState(null) // own profile: {achievements, selectableBadges, featuredBadge}
+  const [publicFeaturedBadge, setPublicFeaturedBadge] = useState(null) // other users' profile
+  const [showBadgePicker, setShowBadgePicker] = useState(false)
+  const [featureBusy, setFeatureBusy] = useState(false)
+  const [featureMessage, setFeatureMessage] = useState(null)
+
   const load = () => {
     setLoading(true)
     const request = isOwnProfile ? api.getMyProfile() : api.getPublicProfile(routeUsername)
@@ -35,6 +42,14 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
       .then(setProfile)
       .catch(() => setProfile({ success: false }))
       .finally(() => setLoading(false))
+
+    if (isOwnProfile) {
+      api.getMyAchievements().then(res => { if (res.success) setAchievementsData(res) }).catch(() => {})
+    } else {
+      api.getPublicFeaturedBadge(routeUsername).then(res => {
+        if (res.success) setPublicFeaturedBadge(res.featuredBadge)
+      }).catch(() => {})
+    }
   }
 
   useEffect(load, [routeUsername])
@@ -111,6 +126,24 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
     }
   }
 
+  const selectFeaturedBadge = async (badgeKey) => {
+    setFeatureBusy(true)
+    setFeatureMessage(null)
+    try {
+      const result = await api.setFeaturedBadge(badgeKey)
+      if (result.success) {
+        setShowBadgePicker(false)
+        load()
+      } else {
+        setFeatureMessage({ type: 'error', text: result.message })
+      }
+    } catch (e) {
+      setFeatureMessage({ type: 'error', text: 'Could not reach the server.' })
+    } finally {
+      setFeatureBusy(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="page">
@@ -130,6 +163,9 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
       </div>
     )
   }
+
+  const featuredBadge = isOwnProfile ? (achievementsData && achievementsData.featuredBadge) : publicFeaturedBadge
+  const selectableBadges = (achievementsData && achievementsData.selectableBadges) || []
 
   return (
     <div className="page">
@@ -248,6 +284,60 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
         </div>
       </div>
 
+      {/* Featured Badge — the ONE badge shown on the Leaderboard. Separate
+          from the full collection below. */}
+      <div className="card profile-card" style={{ marginTop: 20 }}>
+        <h3 style={{ margin: '0 0 6px' }}>Featured Badge</h3>
+        <p className="helper" style={{ marginBottom: 14 }}>
+          {isOwnProfile ? 'This is the one badge shown next to your name on the Leaderboard.' : 'Shown next to their name on the Leaderboard.'}
+        </p>
+
+        {featuredBadge ? (
+          <div className="featured-badge-display">
+            <span className="featured-badge-icon">{featuredBadge.icon}</span>
+            <span className="featured-badge-name">{featuredBadge.name}</span>
+          </div>
+        ) : (
+          <p className="helper" style={{ margin: 0 }}>
+            {isOwnProfile ? "You haven't unlocked a badge yet." : "No badge featured yet."}
+          </p>
+        )}
+
+        {isOwnProfile && (
+          <button className="btn" style={{ marginTop: 14 }} onClick={() => setShowBadgePicker(s => !s)}>
+            Change Badge
+          </button>
+        )}
+
+        {isOwnProfile && showBadgePicker && (
+          <div className="badge-picker-section">
+            {selectableBadges.length === 0 ? (
+              <p className="helper" style={{ margin: 0 }}>
+                No unlocked badges yet — earn XP, catch a limited-time drop, or unlock an achievement below first.
+              </p>
+            ) : (
+              <div className="badge-picker-grid">
+                {selectableBadges.map(b => (
+                  <button
+                    key={b.key}
+                    className={`badge-picker-option ${featuredBadge && featuredBadge.key === b.key ? 'selected' : ''}`}
+                    disabled={featureBusy}
+                    onClick={() => selectFeaturedBadge(b.key)}
+                    title={b.description}
+                  >
+                    <span style={{ fontSize: 20 }}>{b.icon}</span>
+                    <span>{b.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            {featureMessage && (
+              <p className="helper" style={{ color: '#b3372a', margin: '10px 0 0' }}>{featureMessage.text}</p>
+            )}
+          </div>
+        )}
+      </div>
+
       <div className="card profile-card" style={{ marginTop: 20 }}>
         <h3 style={{ margin: '0 0 14px' }}>About</h3>
         {isOwnProfile && editingBio ? (
@@ -295,8 +385,33 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
         )}
       </div>
 
+      {/* NEW: the 8-badge achievement collection with locked/unlocked +
+          progress. Own profile only — this is personal progress data. */}
+      {isOwnProfile && achievementsData && (
+        <div className="card profile-card" style={{ marginTop: 20 }}>
+          <h3 style={{ margin: '0 0 4px' }}>Achievements</h3>
+          <p className="helper" style={{ marginBottom: 16 }}>
+            A separate collection from your XP rank — unlock these by playing.
+          </p>
+          <div className="achievement-grid">
+            {achievementsData.achievements.map(a => (
+              <div key={a.key} className={`achievement-tile ${a.unlocked ? 'unlocked' : 'locked'}`}>
+                <div className="achievement-icon">{a.unlocked ? a.icon : '🔒'}</div>
+                <div className="achievement-name">{a.name}</div>
+                <div className="achievement-desc">{a.description}</div>
+                {!a.unlocked && (
+                  <div className="achievement-progress">{a.current} / {a.target}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Original badge system — Staff, limited-time drops. Preserved exactly
+          as before, just relabeled to distinguish it from Achievements above. */}
       <div className="card profile-card" style={{ marginTop: 20 }}>
-        <h3 style={{ margin: '0 0 14px' }}>Badges</h3>
+        <h3 style={{ margin: '0 0 14px' }}>Special Badges</h3>
         {profile.badges && profile.badges.length > 0 ? (
           <div className="profile-badges-row">
             {profile.badges.map((b, idx) => (
@@ -309,8 +424,8 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
         ) : (
           <p className="helper" style={{ margin: 0 }}>
             {isOwnProfile
-              ? 'No badges yet — earn XP or catch a limited-time drop to start your collection.'
-              : 'No badges yet.'}
+              ? 'No special badges yet — earn admin status or catch a limited-time drop.'
+              : 'No special badges yet.'}
           </p>
         )}
       </div>

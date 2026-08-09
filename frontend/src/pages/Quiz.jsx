@@ -1,5 +1,7 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { api } from '../api.js'
+import { useBadgeToastQueue } from '../utils/useBadgeToastQueue.js'
+import BadgeToast from '../components/BadgeToast.jsx'
 
 export default function Quiz({ user, onXpChange }) {
   const [radicals, setRadicals] = useState([])
@@ -7,6 +9,12 @@ export default function Quiz({ user, onXpChange }) {
   const [options, setOptions] = useState([])
   const [answered, setAnswered] = useState(null)
   const [feedback, setFeedback] = useState('')
+  const { current: currentToast, pushUnlocked, dismissCurrent } = useBadgeToastQueue()
+
+  // Tracks the current 10-question batch for the "Perfectionist" achievement
+  // (100% on 10 quizzes) — this app has no fixed-length quiz sessions, so a
+  // "quiz" is defined here as every 10 questions answered.
+  const batchRef = useRef({ answered: 0, correct: 0 })
 
   useEffect(() => {
     api.getRadicals().then(setRadicals)
@@ -31,7 +39,9 @@ export default function Quiz({ user, onXpChange }) {
   const choose = async (opt) => {
     if (answered) return
     setAnswered(opt.id)
-    if (opt.meaning === current.meaning) {
+    const isCorrect = opt.meaning === current.meaning
+
+    if (isCorrect) {
       setFeedback('Correct! +10 xp')
       if (user) {
         try {
@@ -43,6 +53,20 @@ export default function Quiz({ user, onXpChange }) {
     } else {
       setFeedback(`Not quite — the answer was ${current.meaning}.`)
     }
+
+    // New, separate achievement tracking — doesn't touch XP at all.
+    if (user) {
+      api.recordAnswer(current.id, isCorrect).then(res => pushUnlocked(res.newlyUnlocked))
+
+      const batch = batchRef.current
+      batch.answered += 1
+      if (isCorrect) batch.correct += 1
+      if (batch.answered >= 10) {
+        api.recordQuizComplete(batch.correct, batch.answered).then(res => pushUnlocked(res.newlyUnlocked))
+        batchRef.current = { answered: 0, correct: 0 }
+      }
+    }
+
     setTimeout(newQuestion, 1100)
   }
 
@@ -72,6 +96,7 @@ export default function Quiz({ user, onXpChange }) {
         ))}
       </div>
       <div className="quiz-feedback">{feedback}</div>
+      <BadgeToast badge={currentToast} onDone={dismissCurrent} />
     </div>
   )
 }

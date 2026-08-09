@@ -208,5 +208,59 @@ export const api = {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       body: JSON.stringify({ userId, dropId })
     })
+  },
+
+  getMyAchievements: () => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/achievements/me', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    })
+  },
+
+  getPublicFeaturedBadge: (username) =>
+    request(`/api/achievements/user/${encodeURIComponent(username)}`),
+
+  setFeaturedBadge: (badgeKey) => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/achievements/feature', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: JSON.stringify({ badgeKey })
+    })
+  },
+
+  recordAnswer: (radicalId, correct) => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/achievements/record-answer', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: JSON.stringify({ radicalId, correct })
+    }).catch(() => ({ success: false, newlyUnlocked: [] }))
+  },
+
+  recordQuizComplete: (correct, total) => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/achievements/record-quiz-complete', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: JSON.stringify({ correct, total })
+    }).catch(() => ({ success: false, newlyUnlocked: [] }))
+  },
+
+  recordTimedComplete: (correct, total) => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/achievements/record-timed-complete', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: JSON.stringify({ correct, total })
+    }).catch(() => ({ success: false, newlyUnlocked: [] }))
+  },
+
+  recordFlashcardView: () => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/achievements/record-flashcard-view', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    }).catch(() => ({ success: false, newlyUnlocked: [] }))
   }
 }

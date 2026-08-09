@@ -179,3 +179,105 @@
   align-items: center;
   margin-top: 8px;
 }
+
+.featured-badge-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--blue-soft);
+  border-radius: 12px;
+  width: fit-content;
+}
+.featured-badge-icon {
+  font-size: 28px;
+}
+.featured-badge-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--blue-dark);
+}
+
+.badge-picker-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--panel-border);
+}
+.badge-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+.badge-picker-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--panel-border);
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-mid);
+  text-align: left;
+}
+.badge-picker-option:hover {
+  border-color: var(--blue);
+}
+.badge-picker-option.selected {
+  background: var(--blue-soft);
+  border-color: var(--blue);
+  color: var(--blue-dark);
+}
+.badge-picker-option:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+.achievement-tile {
+  border-radius: 12px;
+  padding: 16px 14px;
+  text-align: center;
+  border: 1.5px solid var(--panel-border);
+}
+.achievement-tile.unlocked {
+  background: #fffaf0;
+  border-color: var(--gold);
+}
+.achievement-tile.locked {
+  background: var(--bg);
+  opacity: 0.65;
+}
+.achievement-icon {
+  font-size: 30px;
+  margin-bottom: 6px;
+}
+.achievement-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-hi);
+  margin-bottom: 4px;
+}
+.achievement-desc {
+  font-size: 11px;
+  color: var(--text-low);
+  line-height: 1.4;
+}
+.achievement-progress {
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--blue);
+}
+
+@media (max-width: 600px) {
+  .achievement-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

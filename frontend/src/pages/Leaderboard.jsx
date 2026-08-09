@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api.js'
-import { currentBadge } from '../utils/badges.js'
 import { avatarEmoji } from '../utils/avatars.js'
 import BadgeIcon from '../components/BadgeIcon.jsx'
 import './Leaderboard.css'
@@ -25,31 +24,27 @@ export default function Leaderboard() {
         <p className="helper">No users yet — be the first to earn XP!</p>
       ) : (
         <div>
-          {users.map((u, i) => {
-            const badge = currentBadge(u.xp)
-            return (
-              <div className={`lb-row ${i === 0 ? 'gold' : ''}`} key={u.id}>
-                <span className="lb-rank">{String(i + 1).padStart(2, '0')}</span>
-                <span className="lb-pfp-circle" onClick={() => navigate(`/profile/${u.username}`)}>
-                  {u.avatarImage ? <img src={u.avatarImage} alt="" className="lb-pfp-img" /> : avatarEmoji(u.avatar)}
+          {users.map((u, i) => (
+            <div className={`lb-row ${i === 0 ? 'gold' : ''}`} key={u.id}>
+              <span className="lb-rank">{String(i + 1).padStart(2, '0')}</span>
+              <span className="lb-pfp-circle" onClick={() => navigate(`/profile/${u.username}`)}>
+                {u.avatarImage ? <img src={u.avatarImage} alt="" className="lb-pfp-img" /> : avatarEmoji(u.avatar)}
+              </span>
+              <span className="lb-name">
+                <span className="lb-name-link" onClick={() => navigate(`/profile/${u.username}`)}>
+                  {u.username}
                 </span>
-                <span className="lb-name">
-                  <span className="lb-name-link" onClick={() => navigate(`/profile/${u.username}`)}>
-                    {u.username}
+                {/* Shows ONLY the user's chosen Featured Badge — never their
+                    full collection. See Profile page for that. */}
+                {u.featuredBadge && (
+                  <span className="lb-featured-badge">
+                    <BadgeIcon icon={u.featuredBadge.icon} name={u.featuredBadge.name} description={u.featuredBadge.description} />
                   </span>
-                  <span className="lb-all-badges">
-                    {badge && (
-                      <BadgeIcon icon={badge.icon} name={badge.label} description={`Earned by reaching ${badge.xp}+ XP`} />
-                    )}
-                    {u.limitedBadges && u.limitedBadges.map((b, idx) => (
-                      <BadgeIcon key={idx} icon={b.icon} name={b.name} description={b.description} />
-                    ))}
-                  </span>
-                </span>
-                <span className="lb-xp">{u.xp} xp · lvl {u.level}</span>
-              </div>
-            )
-          })}
+                )}
+              </span>
+              <span className="lb-xp">{u.xp} xp · lvl {u.level}</span>
+            </div>
+          ))}
         </div>
       )}
     </div>

@@ -6,6 +6,7 @@ import com.mandalink.api.repository.UserRepository;
 import com.mandalink.api.service.EmailService;
 import com.mandalink.api.service.JwtService;
 import com.mandalink.api.service.ModerationService;
+import com.mandalink.api.service.AchievementService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final EmailService emailService;
     private final ModerationService moderationService;
+    private final AchievementService achievementService;
 
     @Value("${app.frontend-base-url:https://mandalink.org}")
     private String frontendBaseUrl;
@@ -32,12 +34,14 @@ public class AuthController {
     private String googleClientId;
 
     public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                           JwtService jwtService, EmailService emailService, ModerationService moderationService) {
+                           JwtService jwtService, EmailService emailService, ModerationService moderationService,
+                           AchievementService achievementService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.emailService = emailService;
         this.moderationService = moderationService;
+        this.achievementService = achievementService;
     }
 
     @PostMapping("/register")
@@ -71,7 +75,7 @@ public class AuthController {
 
         String token = jwtService.generateToken(user.getUsername());
         return new AuthResponse(true, "Account created", token,
-                new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel(), user.getIsAdmin(), java.util.List.of(), user.getAvatar(), user.getAvatarImage()));
+                new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel(), user.getIsAdmin(), achievementService.resolveFeaturedBadge(user), user.getAvatar(), user.getAvatarImage()));
     }
 
     @PostMapping("/login")
@@ -83,7 +87,7 @@ public class AuthController {
         User user = userOpt.get();
         String token = jwtService.generateToken(user.getUsername());
         return new AuthResponse(true, "Login successful", token,
-                new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel(), user.getIsAdmin(), java.util.List.of(), user.getAvatar(), user.getAvatarImage()));
+                new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel(), user.getIsAdmin(), achievementService.resolveFeaturedBadge(user), user.getAvatar(), user.getAvatarImage()));
     }
 
     @PostMapping("/forgot-password")
@@ -228,7 +232,7 @@ public class AuthController {
 
         String token = jwtService.generateToken(user.getUsername());
         return new AuthResponse(true, "Signed in with Google", token,
-                new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel(), user.getIsAdmin(), java.util.List.of(), user.getAvatar(), user.getAvatarImage()));
+                new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel(), user.getIsAdmin(), achievementService.resolveFeaturedBadge(user), user.getAvatar(), user.getAvatarImage()));
     }
 
     @PostMapping("/forgot-username")

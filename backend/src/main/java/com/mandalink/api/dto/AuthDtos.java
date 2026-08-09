@@ -10,10 +10,10 @@ public class AuthDtos {
 
     public record AuthResponse(boolean success, String message, String token, UserSummary user) {}
 
-    public record ClaimedBadge(String icon, String name, String description) {}
+    public record ClaimedBadge(String key, String icon, String name, String description) {}
 
     public record UserSummary(Long id, String username, Integer xp, Integer level,
-                               @JsonProperty("isAdmin") Boolean isAdmin, List<ClaimedBadge> limitedBadges,
+                               @JsonProperty("isAdmin") Boolean isAdmin, ClaimedBadge featuredBadge,
                                String avatar, String avatarImage) {}
 
     public record XpUpdateRequest(Integer amount) {}

@@ -1,6 +1,8 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { api } from '../api.js'
 import { speakChinese, isSpeechSupported } from '../utils/speech.js'
+import { useBadgeToastQueue } from '../utils/useBadgeToastQueue.js'
+import BadgeToast from '../components/BadgeToast.jsx'
 import './Flashcards.css'
 
 const WINDOW = 3 // how many cards to render on each side of the active one
@@ -23,10 +25,21 @@ export default function Flashcards() {
   const [tier, setTier] = useState('')
   const [active, setActive] = useState(0)
   const [flipped, setFlipped] = useState(false)
+  const { current: currentToast, pushUnlocked, dismissCurrent } = useBadgeToastQueue()
+  const prevFlippedRef = useRef(false)
 
   useEffect(() => {
     api.getRadicals().then(setRadicals)
   }, [])
+
+  // Fires once each time a card is flipped TO its answer side — that's what
+  // counts as "completing" a flashcard for the Card Master achievement.
+  useEffect(() => {
+    if (flipped && !prevFlippedRef.current) {
+      api.recordFlashcardView().then(res => pushUnlocked(res.newlyUnlocked))
+    }
+    prevFlippedRef.current = flipped
+  }, [flipped, pushUnlocked])
 
   const filtered = useMemo(() => {
     let list = radicals
@@ -157,6 +170,7 @@ export default function Flashcards() {
           </div>
         </>
       )}
+      <BadgeToast badge={currentToast} onDone={dismissCurrent} />
     </div>
   )
 }

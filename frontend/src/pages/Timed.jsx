@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { api } from '../api.js'
+import { useBadgeToastQueue } from '../utils/useBadgeToastQueue.js'
+import BadgeToast from '../components/BadgeToast.jsx'
 import './Timed.css'
 
 export default function Timed({ user, onXpChange }) {
@@ -10,6 +12,12 @@ export default function Timed({ user, onXpChange }) {
   const [score, setScore] = useState(0)
   const [running, setRunning] = useState(false)
   const intervalRef = useRef(null)
+  const { current: currentToast, pushUnlocked, dismissCurrent } = useBadgeToastQueue()
+
+  // Session-scoped counters for the "Speed Demon" achievement (90%+ accuracy
+  // in a timed session) — separate from `score`, which is XP points, not accuracy.
+  const sessionRef = useRef({ answered: 0, correct: 0 })
+  const wasRunningRef = useRef(false)
 
   useEffect(() => {
     api.getRadicals().then(setRadicals)
@@ -30,6 +38,7 @@ export default function Timed({ user, onXpChange }) {
     setScore(0)
     setTimeLeft(60)
     setRunning(true)
+    sessionRef.current = { answered: 0, correct: 0 }
     newQuestion()
     intervalRef.current = setInterval(() => {
       setTimeLeft(t => {
@@ -48,9 +57,23 @@ export default function Timed({ user, onXpChange }) {
     return () => clearInterval(intervalRef.current)
   }, [radicals])
 
+  // Fires once when a session actually ends (running: true -> false), so we
+  // record the session's accuracy exactly once, not on every render.
+  useEffect(() => {
+    if (wasRunningRef.current && !running && user) {
+      const { answered, correct } = sessionRef.current
+      if (answered > 0) {
+        api.recordTimedComplete(correct, answered).then(res => pushUnlocked(res.newlyUnlocked))
+      }
+    }
+    wasRunningRef.current = running
+  }, [running, user, pushUnlocked])
+
   const choose = async (opt) => {
     if (!running) return
-    if (opt.meaning === current.meaning) {
+    const isCorrect = opt.meaning === current.meaning
+
+    if (isCorrect) {
       const newScore = score + 10
       setScore(newScore)
       if (user) {
@@ -61,6 +84,15 @@ export default function Timed({ user, onXpChange }) {
         } catch {}
       }
     }
+
+    sessionRef.current.answered += 1
+    if (isCorrect) sessionRef.current.correct += 1
+
+    // New, separate achievement tracking — doesn't touch XP/score at all.
+    if (user) {
+      api.recordAnswer(current.id, isCorrect).then(res => pushUnlocked(res.newlyUnlocked))
+    }
+
     newQuestion()
   }
 
@@ -87,6 +119,7 @@ export default function Timed({ user, onXpChange }) {
       <div style={{ textAlign: 'center', marginTop: 20 }}>
         <button className="btn" onClick={start}>restart</button>
       </div>
+      <BadgeToast badge={currentToast} onDone={dismissCurrent} />
     </div>
   )
 }

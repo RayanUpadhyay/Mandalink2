@@ -61,6 +61,9 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String bio = "";
 
+    @Column(name = "featured_badge_key")
+    private String featuredBadgeKey;
+
     public User() {}
 
     public Long getId() { return id; }
@@ -110,4 +113,7 @@ public class User {
 
     public String getBio() { return bio; }
     public void setBio(String bio) { this.bio = bio; }
+
+    public String getFeaturedBadgeKey() { return featuredBadgeKey; }
+    public void setFeaturedBadgeKey(String featuredBadgeKey) { this.featuredBadgeKey = featuredBadgeKey; }
 }
