@@ -26,6 +26,18 @@ export default function Admin() {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null)
   const [deleteBusyId, setDeleteBusyId] = useState(null)
 
+  const [allDrops, setAllDrops] = useState([])
+  const [grantUserId, setGrantUserId] = useState('')
+  const [grantDropId, setGrantDropId] = useState('')
+  const [grantBusy, setGrantBusy] = useState(false)
+  const [grantMessage, setGrantMessage] = useState(null)
+
+  useEffect(() => {
+    api.getAllBadgeDrops().then(res => {
+      if (res.success) setAllDrops(res.drops)
+    }).catch(() => {})
+  }, [])
+
   const toggleAdmin = async (u) => {
     setBusyId(u.id)
     setMessage(null)
@@ -87,6 +99,24 @@ export default function Admin() {
       setDropMessage({ type: 'error', text: 'Could not reach the server.' })
     } finally {
       setDropBusy(false)
+    }
+  }
+
+  const submitGrant = async () => {
+    if (!grantUserId || !grantDropId) {
+      setGrantMessage({ type: 'error', text: 'Pick both a user and a badge.' })
+      return
+    }
+    setGrantBusy(true)
+    setGrantMessage(null)
+    try {
+      const result = await api.grantBadge(Number(grantUserId), Number(grantDropId))
+      setGrantMessage({ type: result.success ? 'success' : 'error', text: result.message })
+      if (result.success) load()
+    } catch (e) {
+      setGrantMessage({ type: 'error', text: 'Could not reach the server.' })
+    } finally {
+      setGrantBusy(false)
     }
   }
 
@@ -188,6 +218,37 @@ export default function Admin() {
         )}
         {dropMessage && (
           <div className={`admin-msg ${dropMessage.type}`} style={{ marginTop: 12 }}>{dropMessage.text}</div>
+        )}
+      </div>
+
+      <div className="card admin-table-card" style={{ marginBottom: 20 }}>
+        <h3 style={{ margin: '0 0 6px' }}>Grant a badge manually</h3>
+        <p className="helper">
+          Works for any badge ever created, including ones whose 24-hour window already ended.
+        </p>
+        {allDrops.length === 0 ? (
+          <p className="helper" style={{ margin: 0 }}>No badges have been created yet.</p>
+        ) : (
+          <div className="admin-drop-form">
+            <select className="admin-drop-input" value={grantUserId} onChange={e => setGrantUserId(e.target.value)}>
+              <option value="">Choose a user...</option>
+              {data.users.map(u => (
+                <option key={u.id} value={u.id}>{u.username}</option>
+              ))}
+            </select>
+            <select className="admin-drop-input" value={grantDropId} onChange={e => setGrantDropId(e.target.value)}>
+              <option value="">Choose a badge...</option>
+              {allDrops.map(d => (
+                <option key={d.id} value={d.id}>{d.icon} {d.name}</option>
+              ))}
+            </select>
+            <button className="btn primary" disabled={grantBusy} onClick={submitGrant}>
+              {grantBusy ? 'Granting...' : 'Grant badge'}
+            </button>
+          </div>
+        )}
+        {grantMessage && (
+          <div className={`admin-msg ${grantMessage.type}`} style={{ marginTop: 12 }}>{grantMessage.text}</div>
         )}
       </div>
 

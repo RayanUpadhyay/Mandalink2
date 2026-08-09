@@ -135,3 +135,12 @@
     background: var(--blue-soft);
   }
 }
+
+.nav-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.nav-avatar {
+  font-size: 14px;
+}

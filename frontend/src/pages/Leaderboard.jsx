@@ -1,19 +1,9 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api.js'
 import { currentBadge } from '../utils/badges.js'
+import { avatarEmoji } from '../utils/avatars.js'
+import BadgeIcon from '../components/BadgeIcon.jsx'
 import './Leaderboard.css'
-
-function BadgeIcon({ icon, name, description }) {
-  return (
-    <span className="badge-hover-wrap">
-      {icon}
-      <span className="badge-tooltip">
-        <strong>{name}</strong>
-        {description && <div className="badge-tooltip-desc">{description}</div>}
-      </span>
-    </span>
-  )
-}
 
 export default function Leaderboard() {
   const [users, setUsers] = useState([])
@@ -38,18 +28,17 @@ export default function Leaderboard() {
             return (
               <div className={`lb-row ${i === 0 ? 'gold' : ''}`} key={u.id}>
                 <span className="lb-rank">{String(i + 1).padStart(2, '0')}</span>
+                <span className="lb-avatar">{avatarEmoji(u.avatar)}</span>
                 <span className="lb-name">
-                  {badge && (
-                    <BadgeIcon icon={badge.icon + ' '} name={badge.label} description={`Earned by reaching ${badge.xp}+ XP`} />
-                  )}
                   {u.username}
-                  {u.limitedBadges && u.limitedBadges.length > 0 && (
-                    <span className="lb-limited-badges">
-                      {u.limitedBadges.map((b, idx) => (
-                        <BadgeIcon key={idx} icon={b.icon} name={b.name} description={b.description} />
-                      ))}
-                    </span>
-                  )}
+                  <span className="lb-all-badges">
+                    {badge && (
+                      <BadgeIcon icon={badge.icon} name={badge.label} description={`Earned by reaching ${badge.xp}+ XP`} />
+                    )}
+                    {u.limitedBadges && u.limitedBadges.map((b, idx) => (
+                      <BadgeIcon key={idx} icon={b.icon} name={b.name} description={b.description} />
+                    ))}
+                  </span>
                 </span>
                 <span className="lb-xp">{u.xp} xp · lvl {u.level}</span>
               </div>

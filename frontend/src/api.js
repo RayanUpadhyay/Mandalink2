@@ -121,5 +121,46 @@ export const api = {
       method: 'DELETE',
       headers: token ? { Authorization: `Bearer ${token}` } : {}
     })
+  },
+
+  getMyProfile: () => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/users/me', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    })
+  },
+
+  changeUsername: (newUsername) => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/users/change-username', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: JSON.stringify({ newUsername })
+    })
+  },
+
+  changeAvatar: (avatar) => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/users/change-avatar', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: JSON.stringify({ avatar })
+    })
+  },
+
+  getAllBadgeDrops: () => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/admin/badge-drops/all', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    })
+  },
+
+  grantBadge: (userId, dropId) => {
+    const token = localStorage.getItem('mandalink_token')
+    return request('/api/admin/grant-badge', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: JSON.stringify({ userId, dropId })
+    })
   }
 }

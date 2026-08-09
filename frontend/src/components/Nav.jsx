@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import { avatarEmoji } from '../utils/avatars.js'
 import './Nav.css'
 
 const LINKS = [
@@ -43,7 +44,12 @@ export default function Nav({ user, onLogout }) {
 
       <div className="nav-right">
         {user ? (
-          <button className="signin-btn" onClick={onLogout}>{user.username} · Log out</button>
+          <>
+            <button className="signin-btn nav-profile-btn" onClick={() => go('/profile')}>
+              <span className="nav-avatar">{avatarEmoji(user.avatar)}</span> {user.username}
+            </button>
+            <button className="signin-btn" onClick={onLogout}>Log out</button>
+          </>
         ) : (
           <button className="signin-btn primary" onClick={() => go('/auth')}>Sign in</button>
         )}
@@ -59,6 +65,9 @@ export default function Nav({ user, onLogout }) {
               {link.label}
             </div>
           ))}
+          {user && (
+            <div className="mobile-menu-link" onClick={() => go('/profile')}>Profile</div>
+          )}
         </div>
       )}
     </div>

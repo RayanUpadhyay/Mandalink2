@@ -1,6 +1,7 @@
 package com.mandalink.api.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.mandalink.api.model.BadgeClaim;
 import com.mandalink.api.model.BadgeDrop;
 import com.mandalink.api.model.User;
 import com.mandalink.api.repository.BadgeClaimRepository;
@@ -185,5 +186,57 @@ public class AdminController {
         userRepository.delete(target);
 
         return new DeleteUserResponse(true, "Deleted account: " + deletedUsername);
+    }
+
+    public record DropSummary(Long id, String name, String icon, String description, LocalDateTime expiresAt) {}
+    public record AllDropsResponse(boolean success, List<DropSummary> drops) {}
+
+    @GetMapping("/badge-drops/all")
+    public AllDropsResponse allDrops(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        User admin = verifyAdmin(authHeader);
+        if (admin == null) {
+            return new AllDropsResponse(false, null);
+        }
+        List<DropSummary> drops = badgeDropRepository.findAll().stream()
+            .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+            .map(d -> new DropSummary(d.getId(), d.getName(), d.getIcon(), d.getDescription(), d.getExpiresAt()))
+            .toList();
+        return new AllDropsResponse(true, drops);
+    }
+
+    public record GrantBadgeRequest(Long userId, Long dropId) {}
+    public record GrantBadgeResponse(boolean success, String message) {}
+
+    @PostMapping("/grant-badge")
+    public GrantBadgeResponse grantBadge(@RequestHeader(value = "Authorization", required = false) String authHeader,
+                                          @RequestBody GrantBadgeRequest req) {
+        User admin = verifyAdmin(authHeader);
+        if (admin == null) {
+            return new GrantBadgeResponse(false, "Not authorized.");
+        }
+        var targetOpt = userRepository.findById(req.userId());
+        if (targetOpt.isEmpty()) {
+            return new GrantBadgeResponse(false, "User not found.");
+        }
+        var dropOpt = badgeDropRepository.findById(req.dropId());
+        if (dropOpt.isEmpty()) {
+            return new GrantBadgeResponse(false, "Badge not found.");
+        }
+        User target = targetOpt.get();
+        BadgeDrop drop = dropOpt.get();
+
+        if (badgeClaimRepository.existsByUserIdAndDropId(target.getId(), drop.getId())) {
+            return new GrantBadgeResponse(false, target.getUsername() + " already has that badge.");
+        }
+
+        // Deliberately bypasses the expiry check — admins can grant any past
+        // badge manually, not just ones still within their 24-hour window.
+        BadgeClaim claim = new BadgeClaim();
+        claim.setUserId(target.getId());
+        claim.setDropId(drop.getId());
+        badgeClaimRepository.save(claim);
+
+        return new GrantBadgeResponse(true,
+            "Granted " + drop.getIcon() + " " + drop.getName() + " to " + target.getUsername() + ".");
     }
 }

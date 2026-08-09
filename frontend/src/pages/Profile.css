@@ -1,0 +1,133 @@
+.profile-card {
+  padding: 26px 28px;
+}
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.profile-avatar-wrap {
+  text-align: center;
+}
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--blue-soft);
+  border: 2.5px solid var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  cursor: pointer;
+}
+.profile-avatar-edit {
+  display: block;
+  font-size: 11px;
+  color: var(--blue);
+  font-weight: 700;
+  margin-top: 4px;
+  cursor: pointer;
+}
+.profile-header-info {
+  flex: 1;
+  min-width: 200px;
+}
+.profile-username-row, .profile-username-edit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.profile-username {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.avatar-picker {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--panel-border);
+}
+.avatar-option {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1.5px solid var(--panel-border);
+  background: #ffffff;
+  font-size: 22px;
+  cursor: pointer;
+}
+.avatar-option:hover {
+  border-color: var(--blue);
+}
+.avatar-option.selected {
+  background: var(--blue-soft);
+  border-color: var(--blue);
+}
+
+.profile-stat-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--panel-border);
+  flex-wrap: wrap;
+}
+.profile-stat {
+  flex: 1;
+  min-width: 100px;
+  text-align: center;
+}
+
+.profile-stat-num {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--blue);
+}
+.profile-stat-label {
+  font-size: 11.5px;
+  color: var(--text-low);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  margin-top: 4px;
+}
+.profile-input {
+  border: 1.5px solid var(--panel-border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: inherit;
+}
+.profile-input:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+
+.profile-badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.profile-badge-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--blue-soft);
+  color: var(--blue-dark);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .avatar-picker {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}

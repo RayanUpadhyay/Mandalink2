@@ -64,7 +64,7 @@ public class AuthController {
 
         String token = jwtService.generateToken(user.getUsername());
         return new AuthResponse(true, "Account created", token,
-                new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel(), user.getIsAdmin(), java.util.List.of()));
+                new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel(), user.getIsAdmin(), java.util.List.of(), user.getAvatar()));
     }
 
     @PostMapping("/login")
@@ -76,7 +76,7 @@ public class AuthController {
         User user = userOpt.get();
         String token = jwtService.generateToken(user.getUsername());
         return new AuthResponse(true, "Login successful", token,
-                new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel(), user.getIsAdmin(), java.util.List.of()));
+                new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel(), user.getIsAdmin(), java.util.List.of(), user.getAvatar()));
     }
 
     @PostMapping("/forgot-password")
@@ -221,7 +221,7 @@ public class AuthController {
 
         String token = jwtService.generateToken(user.getUsername());
         return new AuthResponse(true, "Signed in with Google", token,
-                new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel(), user.getIsAdmin(), java.util.List.of()));
+                new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel(), user.getIsAdmin(), java.util.List.of(), user.getAvatar()));
     }
 
     @PostMapping("/forgot-username")

@@ -17,6 +17,7 @@ import Stroke from './pages/Stroke.jsx'
 import AiHelp from './pages/AiHelp.jsx'
 import Worksheet from './pages/Worksheet.jsx'
 import Admin from './pages/Admin.jsx'
+import Profile from './pages/Profile.jsx'
 
 export default function App() {
   const [user, setUser] = useState(null)
@@ -43,6 +44,25 @@ export default function App() {
     localStorage.removeItem('mandalink_token')
   }
 
+  // After a username change the old JWT's subject is stale, so the backend
+  // issues a fresh token — swap both in one go so the session keeps working.
+  const handleUsernameChanged = (newUsername, newToken) => {
+    setUser(u => {
+      const updated = { ...u, username: newUsername }
+      localStorage.setItem('mandalink_user', JSON.stringify(updated))
+      return updated
+    })
+    localStorage.setItem('mandalink_token', newToken)
+  }
+
+  const handleAvatarChanged = (newAvatar) => {
+    setUser(u => {
+      const updated = { ...u, avatar: newAvatar }
+      localStorage.setItem('mandalink_user', JSON.stringify(updated))
+      return updated
+    })
+  }
+
   return (
     <>
       <Nav user={user} onLogout={handleLogout} />
@@ -61,6 +81,11 @@ export default function App() {
         <Route path="/ai" element={<RequireAuth user={user}><AiHelp /></RequireAuth>} />
         <Route path="/worksheet" element={<RequireAuth user={user}><Worksheet /></RequireAuth>} />
         <Route path="/admin" element={<RequireAuth user={user}><Admin /></RequireAuth>} />
+        <Route path="/profile" element={
+          <RequireAuth user={user}>
+            <Profile user={user} onUsernameChanged={handleUsernameChanged} onAvatarChanged={handleAvatarChanged} />
+          </RequireAuth>
+        } />
       </Routes>
     </>
   )

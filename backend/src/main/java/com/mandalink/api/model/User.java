@@ -41,6 +41,9 @@ public class User {
     @Column(name = "is_admin")
     private Boolean isAdmin = false;
 
+    @Column
+    private String avatar = "panda";
+
     public User() {}
 
     public Long getId() { return id; }
@@ -75,4 +78,7 @@ public class User {
 
     public Boolean getIsAdmin() { return isAdmin; }
     public void setIsAdmin(Boolean isAdmin) { this.isAdmin = isAdmin; }
+
+    public String getAvatar() { return avatar; }
+    public void setAvatar(String avatar) { this.avatar = avatar; }
 }
