@@ -11,8 +11,9 @@ const LINKS = [
   { to: '/timed', label: 'Timed Mode' },
   { to: '/leaderboard', label: 'Leaderboard' },
   { to: '/stroke', label: 'Stroke Order' },
-  { to: '/ai', label: 'AI Help' },
   { to: '/worksheet', label: 'Worksheet' },
+  { to: '/ai', label: 'AI Help' },
+  { to: '/profile', label: 'Profile' },
   { to: '/about', label: 'About' }
 ]
 
@@ -67,9 +68,6 @@ export default function Nav({ user, onLogout }) {
               {link.label}
             </div>
           ))}
-          {user && (
-            <div className="mobile-menu-link" onClick={() => go('/profile')}>Profile</div>
-          )}
         </div>
       )}
     </div>

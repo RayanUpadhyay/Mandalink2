@@ -74,13 +74,14 @@ export default function Home({ user }) {
         <div className="hero-divider"></div>
         <p className="hero-desc">
           Mandalink is your gateway to mastering the building blocks of Chinese — radicals.
-          Through interactive flashcards, AI-powered hints, timed challenges, and animated
-          stroke-order guides, we make learning Chinese characters intuitive, engaging, and
-          effective. Whether you're a complete beginner or brushing up your skills, Mandalink
-          adapts to your pace and helps you build lasting knowledge.
+          Through interactive flashcards, AI-powered hints, timed challenges, animated
+          stroke-order guides and customisable practice worksheets, we make learning Chinese
+          characters intuitive, engaging, and effective. Whether you're a complete beginner or
+          brushing up your skills, Mandalink adapts to your pace and helps you build lasting
+          knowledge.
         </p>
         <p className="hero-featuring">Featuring</p>
-        <p className="hero-feature-list">Flashcards &bull; Quiz Games &bull; Stroke Order &bull; Timed Mode &bull; AI Help &bull; Leaderboard</p>
+        <p className="hero-feature-list">Flashcards &bull; Quiz Games &bull; Stroke Order &bull; Timed Mode &bull; Practice Worksheet &bull; AI Help &bull; Leaderboard</p>
 
         <div className="hero-cta-row">
           <button className="btn primary hero-cta" onClick={() => navigate(user ? '/radicals' : '/auth')}>
@@ -91,7 +92,7 @@ export default function Home({ user }) {
           )}
         </div>
         {radicalCount !== null && (
-          <p className="hero-count">{radicalCount} radicals ready to learn — free forever</p>
+          <p className="hero-count hero-count-highlight">{radicalCount} radicals ready to learn — Lifetime Free Access</p>
         )}
       </div>
 
@@ -166,6 +167,12 @@ export default function Home({ user }) {
         </div>
         <div className="feat" onClick={() => navigate(user ? '/timed' : '/auth')}>
           <div className="ic">时</div><h3>Timed Mode</h3><p>60 seconds on the clock.</p>
+        </div>
+        <div className="feat" onClick={() => navigate(user ? '/quiz' : '/auth')}>
+          <div className="ic">问</div><h3>Quiz</h3><p>Test yourself, radical by radical.</p>
+        </div>
+        <div className="feat" onClick={() => navigate(user ? '/worksheet' : '/auth')}>
+          <div className="ic">卷</div><h3>Practice Worksheet</h3><p>Print a tracing sheet by hand.</p>
         </div>
         <div className="feat" onClick={() => navigate(user ? '/leaderboard' : '/auth')}>
           <div className="ic">榜</div><h3>Leaderboard</h3><p>Climb the ranks with XP.</p>

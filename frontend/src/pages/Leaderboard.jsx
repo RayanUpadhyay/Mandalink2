@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { api } from '../api.js'
 import { avatarEmoji } from '../utils/avatars.js'
 import BadgeIcon from '../components/BadgeIcon.jsx'
@@ -17,7 +17,10 @@ export default function Leaderboard() {
   return (
     <div className="page">
       <h2 className="page-h">Leaderboard</h2>
-      <p className="helper">See how you stack up against other Mandalink learners.</p>
+      <p className="helper">
+        See how you stack up against other Mandalink learners. Edit your{' '}
+        <Link to="/profile" style={{ color: 'var(--blue)', fontWeight: 600 }}>profile</Link> to add a photo or a short bio.
+      </p>
       {loading ? (
         <p className="helper">Loading...</p>
       ) : users.length === 0 ? (

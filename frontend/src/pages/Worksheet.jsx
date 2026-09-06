@@ -37,7 +37,7 @@ export default function Worksheet() {
     <div className="page">
       <div className="worksheet-controls no-print">
         <h2 className="page-h">Practice worksheet</h2>
-        <p className="helper">Pick characters below, then print a tracing worksheet to practice writing by hand.</p>
+        <p className="helper">Search or select characters to create your own worksheet. You can also print a tracing worksheet to practice writing by hand.</p>
 
         <div className="search-bar">
           <input

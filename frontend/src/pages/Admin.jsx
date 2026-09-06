@@ -161,7 +161,11 @@ export default function Admin() {
         <h2 className="page-h">Admin</h2>
         <div className="card admin-denied">
           <p className="helper" style={{ margin: 0 }}>
-            You don't have access to this page. If this seems wrong, ask an existing admin to grant your account access.
+            You don't have access to admin features. If this seems wrong or if you wish to request
+            access to track progress of your team / students you may contact{' '}
+            <a href="mailto:mandalinksupport@gmail.com" style={{ color: 'var(--blue)', fontWeight: 700 }}>
+              mandalinksupport@gmail.com
+            </a>.
           </p>
         </div>
       </div>
