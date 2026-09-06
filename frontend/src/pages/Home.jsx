@@ -136,7 +136,7 @@ export default function Home({ user }) {
 
       {user && (
         <div className="card badges-card">
-          <div className="cotd-label">Your Achievements</div>
+          <div className="cotd-label achievements-label">Your Achievements</div>
           {badges.length === 0 ? (
             <p className="helper" style={{ margin: '10px 0 0' }}>
               Earn XP in Quiz or Timed Mode to unlock your first badge.

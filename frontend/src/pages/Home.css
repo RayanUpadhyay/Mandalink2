@@ -226,3 +226,8 @@
   font-size: 13px;
   white-space: nowrap;
 }
+
+.achievements-label {
+  color: var(--blue);
+  font-weight: 800;
+}
