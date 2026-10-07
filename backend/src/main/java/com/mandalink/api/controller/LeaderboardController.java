@@ -32,6 +32,21 @@ public class LeaderboardController {
             .toList();
     }
 
+    // Public, read-only top 3 for the Hall of Fame island on rayanupadhyay.com.
+    // Only what the leaderboard already shows publicly: username, XP, level, badge icon.
+    public record HallOfFameEntry(String username, Integer xp, Integer level, String badgeIcon) {}
+
+    @GetMapping("/public/hall-of-fame")
+    public List<HallOfFameEntry> hallOfFame() {
+        return userRepository.findAllByOrderByXpDesc().stream()
+            .limit(3)
+            .map(u -> {
+                var badge = achievementService.resolveFeaturedBadge(u);
+                return new HallOfFameEntry(u.getUsername(), u.getXp(), u.getLevel(), badge == null ? null : badge.icon());
+            })
+            .toList();
+    }
+
     @PostMapping("/users/{username}/xp")
     public UserSummary addXp(@PathVariable String username, @RequestBody XpUpdateRequest req) {
         User user = userRepository.findByUsername(username)

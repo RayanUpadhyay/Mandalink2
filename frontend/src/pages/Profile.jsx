@@ -35,6 +35,26 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
   const [featureBusy, setFeatureBusy] = useState(false)
   const [featureMessage, setFeatureMessage] = useState(null)
 
+  const [redeemCode, setRedeemCode] = useState('')
+  const [redeemBusy, setRedeemBusy] = useState(false)
+  const [redeemMessage, setRedeemMessage] = useState(null)
+
+  const submitRedeem = async (e) => {
+    e.preventDefault()
+    if (!redeemCode.trim()) return
+    setRedeemBusy(true)
+    setRedeemMessage(null)
+    try {
+      const res = await api.redeemBadgeCode(redeemCode.trim())
+      setRedeemMessage(res.message)
+      if (res.success) { setRedeemCode(''); load() }
+    } catch {
+      setRedeemMessage('Something went wrong. Try again in a moment.')
+    } finally {
+      setRedeemBusy(false)
+    }
+  }
+
   const load = () => {
     setLoading(true)
     const request = isOwnProfile ? api.getMyProfile() : api.getPublicProfile(routeUsername)
@@ -427,6 +447,27 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
               ? 'No special badges yet — earn admin status or catch a limited-time drop.'
               : 'No special badges yet.'}
           </p>
+        )}
+        {isOwnProfile && (
+          <form className="redeem-form" onSubmit={submitRedeem}>
+            <label htmlFor="redeem-code">
+              Have a quest code from <a href="https://rayanupadhyay.com" target="_blank" rel="noopener noreferrer">rayanupadhyay.com</a>?
+            </label>
+            <div className="redeem-row">
+              <input
+                id="redeem-code"
+                value={redeemCode}
+                onChange={e => setRedeemCode(e.target.value)}
+                placeholder="e.g. ISLES-XXXX-2026"
+                maxLength={40}
+                autoComplete="off"
+              />
+              <button className="btn primary" type="submit" disabled={redeemBusy || !redeemCode.trim()}>
+                {redeemBusy ? 'Checking…' : 'Redeem'}
+              </button>
+            </div>
+            {redeemMessage && <p className="helper" style={{ margin: '8px 0 0' }}>{redeemMessage}</p>}
+          </form>
         )}
       </div>
     </div>

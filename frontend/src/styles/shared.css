@@ -131,3 +131,15 @@
 @media (max-width: 700px) {
   .filter-row { flex-direction: column; }
 }
+
+/* 门 easter egg: a door that leads to rayanupadhyay.com */
+.rad-tile .door-egg {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #c0271c;
+  text-decoration: none;
+  border-bottom: 1px dashed currentColor;
+}
+.rad-tile .door-egg:hover { border-bottom-style: solid; }

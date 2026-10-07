@@ -281,3 +281,21 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Quest codes from rayanupadhyay.com */
+.redeem-form { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--panel-border); }
+.redeem-form label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.redeem-form label a { color: var(--blue); }
+.redeem-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.redeem-row input {
+  flex: 1;
+  min-width: 180px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--panel-border);
+  background: var(--panel);
+  color: var(--text-hi);
+  font: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

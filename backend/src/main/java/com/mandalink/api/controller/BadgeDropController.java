@@ -59,6 +59,36 @@ public class BadgeDropController {
             drop.getDescription(), Math.max(0, secondsRemaining), claimed);
     }
 
+    public record RedeemRequest(String code) {}
+    public record RedeemResponse(boolean success, String message, String icon, String name) {}
+
+    // Codes are earned by completing quests on rayanupadhyay.com.
+    @PostMapping("/redeem")
+    public RedeemResponse redeem(@RequestHeader(value = "Authorization", required = false) String authHeader,
+                                  @RequestBody RedeemRequest req) {
+        User user = userFromToken(authHeader);
+        if (user == null) {
+            return new RedeemResponse(false, "Log in to redeem a code.", null, null);
+        }
+        String code = req.code() == null ? "" : req.code().trim();
+        if (code.isEmpty() || code.length() > 40) {
+            return new RedeemResponse(false, "Enter a code first.", null, null);
+        }
+        var dropOpt = badgeDropRepository.findFirstByRedeemCodeIgnoreCase(code);
+        if (dropOpt.isEmpty()) {
+            return new RedeemResponse(false, "That code doesn't match any badge. Check it on rayanupadhyay.com.", null, null);
+        }
+        BadgeDrop drop = dropOpt.get();
+        if (badgeClaimRepository.existsByUserIdAndDropId(user.getId(), drop.getId())) {
+            return new RedeemResponse(false, "You already have " + drop.getIcon() + " " + drop.getName() + ".", drop.getIcon(), drop.getName());
+        }
+        BadgeClaim claim = new BadgeClaim();
+        claim.setUserId(user.getId());
+        claim.setDropId(drop.getId());
+        badgeClaimRepository.save(claim);
+        return new RedeemResponse(true, "Unlocked " + drop.getIcon() + " " + drop.getName() + "!", drop.getIcon(), drop.getName());
+    }
+
     public record ClaimRequest(Long dropId) {}
     public record ClaimResponse(boolean success, String message) {}
 

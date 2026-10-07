@@ -26,6 +26,11 @@ public class BadgeDrop {
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
+    // Quest badges (earned on rayanupadhyay.com) have a redeem code and never
+    // show up as the live drop. Normal admin drops leave this null.
+    @Column(name = "redeem_code")
+    private String redeemCode;
+
     public BadgeDrop() {}
 
     public Long getId() { return id; }
@@ -45,4 +50,7 @@ public class BadgeDrop {
 
     public LocalDateTime getExpiresAt() { return expiresAt; }
     public void setExpiresAt(LocalDateTime expiresAt) { this.expiresAt = expiresAt; }
+
+    public String getRedeemCode() { return redeemCode; }
+    public void setRedeemCode(String redeemCode) { this.redeemCode = redeemCode; }
 }

@@ -9,8 +9,13 @@ import java.util.Optional;
 public interface BadgeDropRepository extends JpaRepository<BadgeDrop, Long> {
     List<BadgeDrop> findByExpiresAtAfterOrderByCreatedAtDesc(LocalDateTime now);
 
+    Optional<BadgeDrop> findFirstByRedeemCodeIgnoreCase(String redeemCode);
+
+    // Quest badges (with a redeem code) are excluded so they never block or
+    // replace the normal one-at-a-time limited drop.
     default Optional<BadgeDrop> findActive(LocalDateTime now) {
-        List<BadgeDrop> active = findByExpiresAtAfterOrderByCreatedAtDesc(now);
-        return active.isEmpty() ? Optional.empty() : Optional.of(active.get(0));
+        return findByExpiresAtAfterOrderByCreatedAtDesc(now).stream()
+            .filter(d -> d.getRedeemCode() == null)
+            .findFirst();
     }
 }

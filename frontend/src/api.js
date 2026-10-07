@@ -95,6 +95,9 @@ export const api = {
 
   getActiveBadgeDrop: () => request('/api/badge-drops/active'),
 
+  redeemBadgeCode: (code) =>
+    request('/api/badge-drops/redeem', { method: 'POST', body: JSON.stringify({ code }) }),
+
   claimBadgeDrop: (dropId) =>
     request('/api/badge-drops/claim', { method: 'POST', body: JSON.stringify({ dropId }) }),
 
