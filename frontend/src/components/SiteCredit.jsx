@@ -1,13 +1,9 @@
 import { useState } from 'react'
-import { useLocation } from 'react-router-dom'
 import './SiteCredit.css'
 
 const SITE = 'https://rayanupadhyay.com'
 
 export default function SiteCredit() {
-  const location = useLocation()
-  const onHome = location.pathname === '/'
-
   const [pillOpen, setPillOpen] = useState(() => {
     try { return localStorage.getItem('mandalink_site_pill') !== 'closed' } catch { return true }
   })
@@ -19,12 +15,6 @@ export default function SiteCredit() {
 
   return (
     <>
-      {onHome && (
-        <a className="site-sash" href={SITE} target="_blank" rel="noopener noreferrer" aria-label="Visit rayanupadhyay.com">
-          <span>rayanupadhyay.com</span>
-        </a>
-      )}
-
       {pillOpen && (
         <div className="site-pill" role="note">
           <span className="site-pill-new">New</span>
