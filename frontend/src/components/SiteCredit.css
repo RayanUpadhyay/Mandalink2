@@ -56,3 +56,43 @@
   to { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) { .site-pill { animation: none; } }
+
+/* Magazine-style corner sash (home page only) */
+.site-sash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 190px;
+  height: 190px;
+  overflow: hidden;
+  z-index: 60;
+  pointer-events: none;
+  text-decoration: none;
+}
+.site-sash span {
+  position: absolute;
+  top: 46px;
+  left: -64px;
+  width: 280px;
+  padding: 7px 0;
+  transform: rotate(-45deg);
+  background: #f6d93a;
+  border-top: 2px solid #16181d;
+  border-bottom: 2px solid #16181d;
+  box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.45);
+  color: #16181d;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  pointer-events: auto;
+  transition: background 0.2s;
+}
+.site-sash:hover span { background: #ffe45c; }
+.site-sash:focus-visible span { outline: 3px solid #c0271c; outline-offset: 2px; }
+@media (max-width: 600px) {
+  .site-sash { width: 140px; height: 140px; }
+  .site-sash span { top: 32px; left: -58px; width: 220px; font-size: 12px; padding: 5px 0; }
+}
