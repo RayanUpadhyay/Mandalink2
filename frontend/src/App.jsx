@@ -18,6 +18,7 @@ import AiHelp from './pages/AiHelp.jsx'
 import Worksheet from './pages/Worksheet.jsx'
 import Admin from './pages/Admin.jsx'
 import Profile from './pages/Profile.jsx'
+import SiteCredit from './components/SiteCredit.jsx'
 
 export default function App() {
   const [user, setUser] = useState(null)
@@ -92,6 +93,7 @@ export default function App() {
           </RequireAuth>
         } />
       </Routes>
+      <SiteCredit />
     </>
   )
 }
