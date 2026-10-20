@@ -43,7 +43,20 @@ public class SecurityConfig {
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
+        // The public announcement board is read-only data meant to be shown on
+        // other sites too (e.g. rayanupadhyay.com). Any origin may GET it, but
+        // with NO credentials, so this doesn't loosen anything else in the API.
+        // It must be registered BEFORE "/**" — the first matching rule wins.
+        CorsConfiguration publicRead = new CorsConfiguration();
+        publicRead.setAllowedOriginPatterns(List.of("*"));
+        publicRead.setAllowedMethods(List.of("GET", "OPTIONS"));
+        publicRead.setAllowedHeaders(List.of("*"));
+        publicRead.setAllowCredentials(false);
+        publicRead.setMaxAge(3600L);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/announcements", publicRead);
+        source.registerCorsConfiguration("/api/announcements/**", publicRead);
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

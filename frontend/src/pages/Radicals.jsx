@@ -66,17 +66,6 @@ export default function Radicals() {
               <div className="ch">{r.character}</div>
               <div className="py">{r.pinyin}</div>
               <div className="mn">{r.meaning}</div>
-              {/[门門]/.test(r.character || '') && (
-                <a
-                  className="door-egg"
-                  href="https://rayanupadhyay.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={e => e.stopPropagation()}
-                >
-                  This door leads somewhere… →
-                </a>
-              )}
             </div>
           ))}
         </div>

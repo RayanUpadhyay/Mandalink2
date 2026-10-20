@@ -14,6 +14,7 @@ const LINKS = [
   { to: '/worksheet', label: 'Worksheet' },
   { to: '/ai', label: 'AI Help' },
   { to: '/profile', label: 'Profile' },
+  { to: '/announcements', label: 'Announcements' },
   { to: '/about', label: 'About' }
 ]
 

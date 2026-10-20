@@ -1,6 +1,9 @@
 const RAW_API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 const API_BASE = RAW_API_BASE.replace(/\/+$/, '')
 
+// Exposed so pages can build absolute URLs for server-hosted files (announcement images).
+export const apiBase = API_BASE
+
 async function request(path, options = {}) {
   const token = localStorage.getItem('mandalink_token')
   const res = await fetch(`${API_BASE}${path}`, {
@@ -94,9 +97,6 @@ export const api = {
   },
 
   getActiveBadgeDrop: () => request('/api/badge-drops/active'),
-
-  redeemBadgeCode: (code) =>
-    request('/api/badge-drops/redeem', { method: 'POST', body: JSON.stringify({ code }) }),
 
   claimBadgeDrop: (dropId) =>
     request('/api/badge-drops/claim', { method: 'POST', body: JSON.stringify({ dropId }) }),
@@ -265,5 +265,22 @@ export const api = {
       method: 'POST',
       headers: token ? { Authorization: `Bearer ${token}` } : {}
     }).catch(() => ({ success: false, newlyUnlocked: [] }))
-  }
+  },
+
+  // ----- Announcements -----
+  // Public: no login needed. Also what the rayanupadhyay.com embed reads.
+  getAnnouncements: (category) =>
+    request(`/api/announcements${category && category !== 'all' ? `?category=${encodeURIComponent(category)}` : ''}`),
+
+  // Admin only (the token is attached automatically by request()).
+  adminGetAnnouncements: () => request('/api/admin/announcements'),
+
+  adminCreateAnnouncement: (payload) =>
+    request('/api/admin/announcements', { method: 'POST', body: JSON.stringify(payload) }),
+
+  adminUpdateAnnouncement: (id, payload) =>
+    request(`/api/admin/announcements/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
+
+  adminDeleteAnnouncement: (id) =>
+    request(`/api/admin/announcements/${id}`, { method: 'DELETE' })
 }

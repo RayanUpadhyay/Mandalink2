@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api.js'
+import AnnouncementManager from '../components/AnnouncementManager.jsx'
 import './Admin.css'
 
 export default function Admin() {
@@ -203,6 +204,8 @@ export default function Admin() {
       {message && (
         <div className={`admin-msg ${message.type}`}>{message.text}</div>
       )}
+
+      <AnnouncementManager />
 
       {pendingAvatars.length > 0 && (
         <div className="card admin-table-card" style={{ marginBottom: 20 }}>
