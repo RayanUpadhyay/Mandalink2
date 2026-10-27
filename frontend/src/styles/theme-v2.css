@@ -41,7 +41,9 @@ html[data-theme="v2"] .nav-more-menu a { color: #d9d4c9; }
 html[data-theme="v2"] .nav-more-menu a:hover, html[data-theme="v2"] .nav-more-menu a.active { background: rgba(255,255,255,0.08); color: #fff; }
 html[data-theme="v2"] .signin-btn { background: transparent; color: #e9e4d9; border-color: #4a526a; }
 html[data-theme="v2"] .signin-btn.primary { background: var(--blue); border: none; color: #fff; }
-html[data-theme="v2"] .theme-toggle { background: #f4efe6; color: #1c2130; border-color: transparent; }
+html[data-theme="v2"] .theme-switch { background: rgba(255,255,255,0.06); border-color: #4a526a; }
+html[data-theme="v2"] .theme-switch button { color: #c9c4b8; }
+html[data-theme="v2"] .theme-switch button.on { background: var(--blue); color: #fff; }
 html[data-theme="v2"] .menu-toggle span { background: #f4efe6; }
 html[data-theme="v2"] .mobile-menu { background: #1c2130; }
 html[data-theme="v2"] .mobile-menu-link { color: #e9e4d9; border-bottom-color: #2d3446; }

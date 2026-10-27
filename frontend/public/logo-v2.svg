@@ -1,8 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Mandalink">
-  <rect x="2" y="2" width="60" height="60" rx="15" fill="#c2452d"/>
-  <rect x="6.5" y="6.5" width="51" height="51" rx="11" fill="none" stroke="#fff" stroke-opacity=".32" stroke-width="1.4"/>
-  <circle cx="18.5" cy="13.5" r="2.6" fill="#fdf7ee"/>
-  <path d="M18.5 20v29M18.5 18.5h27v26.5c0 2.6-1.6 4-4.3 4h-3.2" fill="none" stroke="#fdf7ee" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="31.5" cy="27" r="3.7" fill="#fdf7ee"/>
-  <path d="M31.5 32.5 25 45M31.5 32.5 38 45" fill="none" stroke="#fdf7ee" stroke-width="4" stroke-linecap="round"/>
+  <!-- red seal (印章) with the character 字 "character": 宀 radical in gold over 子 -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#c2452d"/>
+  <rect x="6" y="6" width="52" height="52" rx="10.5" fill="none" stroke="#fdf6ec" stroke-opacity=".28" stroke-width="1.3"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M31.2 11.2 L33.4 16.4" stroke="#f3c77a" stroke-width="4.4"/>
+    <path d="M16.5 26.2 V21 H47.5 V26.2" stroke="#f3c77a" stroke-width="4.4"/>
+    <path d="M21.5 30.5 H41.5 L33.2 37" stroke="#fdf6ec" stroke-width="4.4"/>
+    <path d="M33.2 37 V49.5 Q33.2 53.6 28.6 52.4" stroke="#fdf6ec" stroke-width="4.4"/>
+    <path d="M16.5 42.2 H48" stroke="#fdf6ec" stroke-width="4.4"/>
+  </g>
 </svg>

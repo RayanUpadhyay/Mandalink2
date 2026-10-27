@@ -70,10 +70,10 @@
 .nav-measure { position: absolute; visibility: hidden; pointer-events: none; height: 0; overflow: hidden; flex: none; left: 0; top: 0; }
 .logo-group { flex: none; }
 .nav-right { flex: none; }
-.theme-toggle {
-  font-family: inherit; font-size: 12.5px; font-weight: 800; padding: 7px 12px; border-radius: 999px;
-  border: 1.5px solid var(--panel-border); background: var(--blue-soft); color: var(--blue-dark); cursor: pointer; white-space: nowrap;
-}
+.theme-switch { display: inline-flex; padding: 3px; gap: 2px; border-radius: 999px; border: 1.5px solid var(--panel-border); background: #fff; flex: none; }
+.theme-switch button { border: none; background: none; font-family: inherit; font-size: 12px; font-weight: 800; letter-spacing: .02em; padding: 5px 11px; border-radius: 999px; color: var(--text-low); cursor: pointer; }
+.theme-switch button:hover:not(.on) { color: var(--text-hi); }
+.theme-switch button.on { background: var(--blue); color: #fff; }
 @media (max-width: 1180px) { .nav-username { display: none; } }
 .nav-links a.active {
   background: var(--blue-soft);

@@ -103,9 +103,10 @@ export default function Nav({ user, onLogout }) {
       </div>
 
       <div className="nav-right">
-        <button className="theme-toggle" onClick={toggleTheme} title={theme === 'v2' ? 'Switch back to the classic look' : 'Try the new look (V2)'}>
-          {theme === 'v2' ? 'Classic' : '✦ V2'}
-        </button>
+        <div className="theme-switch" role="group" aria-label="Site look">
+          <button className={theme !== 'v2' ? 'on' : ''} aria-pressed={theme !== 'v2'} onClick={() => setTheme('v1')} title="Classic look">V1</button>
+          <button className={theme === 'v2' ? 'on' : ''} aria-pressed={theme === 'v2'} onClick={() => setTheme('v2')} title="New look">V2</button>
+        </div>
         {user ? (
           <>
             <button className="signin-btn nav-profile-btn" onClick={() => navigate('/profile')}>
@@ -128,7 +129,7 @@ export default function Nav({ user, onLogout }) {
           {links.map(link => (
             <div key={link.to} className="mobile-menu-link" onClick={() => navigate(link.to)}>{link.label}</div>
           ))}
-          <div className="mobile-menu-link" onClick={toggleTheme}>{theme === 'v2' ? 'Switch to classic look' : '✦ Try the new look (V2)'}</div>
+          <div className="mobile-menu-link" onClick={toggleTheme}>{theme === 'v2' ? 'Switch to V1 look' : 'Switch to V2 look'}</div>
         </div>
       )}
     </div>
