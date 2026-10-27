@@ -1,0 +1,47 @@
+/* V2 "Ink & Seal" look. Only active when <html data-theme="v2">. Every component
+   uses the CSS variables, so overriding them re-skins the whole site. */
+html[data-theme="v2"] {
+  --bg: #f4efe6;
+  --panel-bg: #fffdf8;
+  --panel: #fffdf8;
+  --blue: #c2452d;        /* primary: seal red */
+  --blue-dark: #9c3220;
+  --blue-soft: #f7e4dd;
+  --gold: #a87a2a;
+  --teal: #2c6e61;
+  --panel-border: #e2d7c4;
+  --text-hi: #1c2130;
+  --text-mid: #434957;
+  --text-low: #7a7d86;
+  --radius: 18px;
+}
+html[data-theme="v2"] body {
+  background-image: radial-gradient(circle at 12% 0%, rgba(194, 69, 45, 0.07), transparent 38%),
+                    radial-gradient(circle at 90% 30%, rgba(44, 110, 97, 0.06), transparent 40%);
+  background-attachment: fixed;
+  font-family: 'Plus Jakarta Sans', 'Manrope', sans-serif;
+}
+html[data-theme="v2"] h1, html[data-theme="v2"] h2, html[data-theme="v2"] .page-h, html[data-theme="v2"] .hero-h {
+  font-family: 'Noto Serif SC', Georgia, serif;
+  letter-spacing: 0;
+}
+html[data-theme="v2"] .card { box-shadow: 0 1px 0 rgba(28, 33, 48, 0.04), 0 10px 28px rgba(28, 33, 48, 0.06); }
+html[data-theme="v2"] .btn { border-radius: 12px; }
+html[data-theme="v2"] .btn.primary { box-shadow: 0 6px 16px rgba(194, 69, 45, 0.28); }
+
+/* nav: dark ink bar */
+html[data-theme="v2"] .topnav { background: rgba(28, 33, 48, 0.97); border-bottom: none; }
+html[data-theme="v2"] .logo-group { color: #f4efe6; }
+html[data-theme="v2"] .logo-text { color: #f4efe6; font-family: 'Noto Serif SC', Georgia, serif; font-weight: 700; }
+html[data-theme="v2"] .nav-links a, html[data-theme="v2"] .nav-more { color: #c9c4b8; }
+html[data-theme="v2"] .nav-links a:hover:not(.active), html[data-theme="v2"] .nav-more:hover { background: rgba(255,255,255,0.08); color: #fff; }
+html[data-theme="v2"] .nav-links a.active, html[data-theme="v2"] .nav-more.active { background: var(--blue); color: #fff; }
+html[data-theme="v2"] .nav-more-menu { background: #232a3b; border-color: #343c50; }
+html[data-theme="v2"] .nav-more-menu a { color: #d9d4c9; }
+html[data-theme="v2"] .nav-more-menu a:hover, html[data-theme="v2"] .nav-more-menu a.active { background: rgba(255,255,255,0.08); color: #fff; }
+html[data-theme="v2"] .signin-btn { background: transparent; color: #e9e4d9; border-color: #4a526a; }
+html[data-theme="v2"] .signin-btn.primary { background: var(--blue); border: none; color: #fff; }
+html[data-theme="v2"] .theme-toggle { background: #f4efe6; color: #1c2130; border-color: transparent; }
+html[data-theme="v2"] .menu-toggle span { background: #f4efe6; }
+html[data-theme="v2"] .mobile-menu { background: #1c2130; }
+html[data-theme="v2"] .mobile-menu-link { color: #e9e4d9; border-bottom-color: #2d3446; }

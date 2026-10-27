@@ -19,6 +19,7 @@ import Worksheet from './pages/Worksheet.jsx'
 import Admin from './pages/Admin.jsx'
 import Profile from './pages/Profile.jsx'
 import Announcements from './pages/Announcements.jsx'
+import { IbHome, IbUnit, IbSection } from './pages/Ib.jsx'
 
 export default function App() {
   // Read the saved login synchronously. If this started as null and was filled in
@@ -78,6 +79,9 @@ export default function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/about" element={<About />} />
         <Route path="/announcements" element={<Announcements user={user} />} />
+        <Route path="/ib" element={<IbHome />} />
+        <Route path="/ib/:unitId" element={<IbUnit />} />
+        <Route path="/ib/:unitId/:sectionId" element={<IbSection />} />
         <Route path="/radicals" element={<RequireAuth user={user}><Radicals /></RequireAuth>} />
         <Route path="/flashcards" element={<RequireAuth user={user}><Flashcards /></RequireAuth>} />
         <Route path="/quiz" element={<RequireAuth user={user}><Quiz user={user} onXpChange={setUser} /></RequireAuth>} />
