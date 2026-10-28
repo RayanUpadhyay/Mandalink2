@@ -4,6 +4,8 @@ import HanziWriter from 'hanzi-writer'
 import { UNIT1, TEXT_TYPES } from '../ib/unit1.js'
 import CHAR_INFO from '../ib/charInfo.json'
 import { speakChinese, isSpeechSupported } from '../utils/speech.js'
+import { UNITS, loadProgress, saveProgress } from '../ib/progress.js'
+import { useTrack } from '../utils/track.js'
 import './Ib.css'
 
 // ---------------------------------------------------------------- course map
@@ -24,16 +26,7 @@ const COURSE = [
     { no: 5, zh: '迁移', en: 'Migration' }
   ] }
 ]
-const UNITS = { u1: UNIT1 }
 const CIRCLED = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩']
-
-// ---------------------------------------------------------------- progress (saved in this browser)
-const PKEY = 'mandalink_ib_progress'
-const loadProgress = () => { try { return JSON.parse(localStorage.getItem(PKEY)) || {} } catch { return {} } }
-const saveProgress = (unitId, sectionId, score, total) => {
-  const p = loadProgress(); p[`${unitId}/${sectionId}`] = { score, total, at: Date.now() }
-  try { localStorage.setItem(PKEY, JSON.stringify(p)) } catch {}
-}
 
 // ---------------------------------------------------------------- answer checking
 const norm = s => (s || '').toLowerCase().replace(/[\s，。、！？；：,.!?;:"'“”‘’（）()《》「」\-—…·]/g, '')
@@ -44,6 +37,7 @@ const matches = (answer, accept) => {
 
 // ================================================================= /ib
 export function IbHome() {
+  const [track, setTrack] = useTrack()
   const progress = loadProgress()
   const doneIn = (unit) => unit.sections.filter(s => progress[`${unit.id}/${s.id}`]).length
   return (
@@ -57,6 +51,10 @@ export function IbHome() {
           and stroke order.
         </p>
         <div className="ib-hero-note">IGCSE Chinese is coming in a later phase.</div>
+        {track !== 'ib' && (
+          <button className="btn ib-track-btn" onClick={() => setTrack('ib')}>Make IB my study track</button>
+        )}
+        {track === 'ib' && <p className="ib-track-on">This is your study track, so it's pinned first in the menu.</p>}
       </div>
       {COURSE.map(theme => (
         <section key={theme.no} className="ib-theme">

@@ -52,14 +52,14 @@ public class UserController {
                                    Integer xp, Integer level, String avatar, String avatarImage,
                                    Boolean hasPendingAvatar, String bio, Boolean isAdmin,
                                    Integer rank, Integer totalUsers, List<ClaimedBadge> badges,
-                                   LocalDateTime createdAt) {}
+                                   LocalDateTime createdAt, String studyTrack) {}
 
     @GetMapping("/me")
     public ProfileResponse me(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         User user = userFromToken(authHeader);
         if (user == null) {
             return new ProfileResponse(false, "Not logged in.", null, null, null, null, null,
-                null, null, null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null, null, null);
         }
 
         List<User> ranked = userRepository.findAllByOrderByXpDesc();
@@ -74,7 +74,7 @@ public class UserController {
         return new ProfileResponse(true, "OK", user.getId(), user.getUsername(), user.getEmail(),
             user.getXp(), user.getLevel(), user.getAvatar(), user.getAvatarImage(),
             user.getPendingAvatarImage() != null, user.getBio(), user.getIsAdmin(),
-            rank, ranked.size(), badgeService.badgesFor(user), user.getCreatedAt());
+            rank, ranked.size(), badgeService.badgesFor(user), user.getCreatedAt(), user.getStudyTrack());
     }
 
     // Public view of someone ELSE's profile — no auth required (same info
@@ -215,5 +215,27 @@ public class UserController {
         user.setBio(bio);
         userRepository.save(user);
         return new ChangeBioResponse(true, "Bio updated.");
+    }
+
+    // ----- Study track -----
+    // Fixed set, validated server-side like avatars.
+    public static final Set<String> ALLOWED_TRACKS = Set.of("general", "ib", "igcse");
+
+    public record ChangeTrackRequest(String track) {}
+    public record ChangeTrackResponse(boolean success, String message, String studyTrack) {}
+
+    @PostMapping("/change-track")
+    public ChangeTrackResponse changeTrack(@RequestHeader(value = "Authorization", required = false) String authHeader,
+                                            @RequestBody ChangeTrackRequest req) {
+        User user = userFromToken(authHeader);
+        if (user == null) {
+            return new ChangeTrackResponse(false, "Not logged in.", null);
+        }
+        if (req.track() == null || !ALLOWED_TRACKS.contains(req.track())) {
+            return new ChangeTrackResponse(false, "Not a valid study track.", user.getStudyTrack());
+        }
+        user.setStudyTrack(req.track());
+        userRepository.save(user);
+        return new ChangeTrackResponse(true, "Study track updated.", user.getStudyTrack());
     }
 }

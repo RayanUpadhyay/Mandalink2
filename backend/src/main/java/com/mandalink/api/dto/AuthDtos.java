@@ -14,7 +14,7 @@ public class AuthDtos {
 
     public record UserSummary(Long id, String username, Integer xp, Integer level,
                                @JsonProperty("isAdmin") Boolean isAdmin, ClaimedBadge featuredBadge,
-                               String avatar, String avatarImage) {}
+                               String avatar, String avatarImage, String studyTrack) {}
 
     public record XpUpdateRequest(Integer amount) {}
 

@@ -28,7 +28,7 @@ public class LeaderboardController {
     public List<UserSummary> leaderboard() {
         return userRepository.findAllByOrderByXpDesc().stream()
             .map(u -> new UserSummary(u.getId(), u.getUsername(), u.getXp(), u.getLevel(), u.getIsAdmin(),
-                achievementService.resolveFeaturedBadge(u), u.getAvatar(), u.getAvatarImage()))
+                achievementService.resolveFeaturedBadge(u), u.getAvatar(), u.getAvatarImage(), null))
             .toList();
     }
 
@@ -55,6 +55,6 @@ public class LeaderboardController {
         }
 
         return new UserSummary(user.getId(), user.getUsername(), user.getXp(), user.getLevel(), user.getIsAdmin(),
-            achievementService.resolveFeaturedBadge(user), user.getAvatar(), user.getAvatarImage());
+            achievementService.resolveFeaturedBadge(user), user.getAvatar(), user.getAvatarImage(), user.getStudyTrack());
     }
 }

@@ -150,3 +150,9 @@
   .ib-passage { padding: 18px; } .ib-passage p, .ib-exam { font-size: 16px; }
   .ib-table th { width: 44%; }
 }
+
+/* ---------- study track button on the IB home ---------- */
+.ib-track-btn { margin-top: 14px; }
+.ib-track-on { margin: 14px 0 0; font-size: 13px; color: var(--text-low); }
+.igcse-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.igcse-actions .btn { text-decoration: none; display: inline-block; }

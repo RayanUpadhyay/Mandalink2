@@ -4,6 +4,7 @@ import { api } from '../api.js'
 import { speakChinese, isSpeechSupported } from '../utils/speech.js'
 import { earnedBadges, nextBadge } from '../utils/badges.js'
 import { useTheme, logoFor } from '../utils/theme.js'
+import TrackCard from '../components/TrackCard.jsx'
 import './Home.css'
 
 const primaryChar = (character) => (character || '').split(' ')[0].trim()
@@ -97,6 +98,8 @@ export default function Home({ user }) {
           <p className="hero-count hero-count-highlight">{radicalCount} radicals ready to learn — Lifetime Free Access</p>
         )}
       </div>
+
+      <TrackCard />
 
       {cotd && (
         <div className="card cotd-card">

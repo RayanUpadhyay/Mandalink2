@@ -4,6 +4,7 @@ import { api } from '../api.js'
 import { AVATARS, avatarEmoji } from '../utils/avatars.js'
 import { resizeImageFile } from '../utils/imageResize.js'
 import BadgeIcon from '../components/BadgeIcon.jsx'
+import TrackPicker from '../components/TrackPicker.jsx'
 import './Profile.css'
 
 export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
@@ -283,6 +284,18 @@ export default function Profile({ user, onUsernameChanged, onAvatarChanged }) {
           </div>
         </div>
       </div>
+
+      {/* Study track: private, only on your own profile. */}
+      {isOwnProfile && (
+        <div className="card profile-card" style={{ marginTop: 20 }}>
+          <h3 style={{ margin: '0 0 6px' }}>Study Track</h3>
+          <p className="helper" style={{ margin: 0 }}>
+            Decides which course Mandalink puts first in the menu and on Home. Every tool stays available on every track.
+            Only you can see this.
+          </p>
+          <TrackPicker />
+        </div>
+      )}
 
       {/* Featured Badge — the ONE badge shown on the Leaderboard. Separate
           from the full collection below. */}

@@ -20,6 +20,8 @@ import Admin from './pages/Admin.jsx'
 import Profile from './pages/Profile.jsx'
 import Announcements from './pages/Announcements.jsx'
 import { IbHome, IbUnit, IbSection } from './pages/Ib.jsx'
+import Igcse from './pages/Igcse.jsx'
+import { getTrack, applyTrackLocally } from './utils/track.js'
 
 export default function App() {
   // Read the saved login synchronously. If this started as null and was filled in
@@ -37,6 +39,18 @@ export default function App() {
   useEffect(() => {
     api.trackPageView(location.pathname)
   }, [location.pathname])
+
+  // Keep the study track in step with the account. The account's choice wins;
+  // if the account has none yet but this browser does (picked before signing
+  // in), save the browser's choice to the account.
+  useEffect(() => {
+    if (!user) return
+    api.getMyProfile().then(p => {
+      if (!p || !p.success) return
+      if (p.studyTrack) applyTrackLocally(p.studyTrack)
+      else if (getTrack()) api.changeTrack(getTrack()).catch(() => {})
+    }).catch(() => {})
+  }, [user && user.username])
 
   const handleAuth = (userSummary, token) => {
     setUser(userSummary)
@@ -82,6 +96,7 @@ export default function App() {
         <Route path="/ib" element={<IbHome />} />
         <Route path="/ib/:unitId" element={<IbUnit />} />
         <Route path="/ib/:unitId/:sectionId" element={<IbSection />} />
+        <Route path="/igcse" element={<Igcse />} />
         <Route path="/radicals" element={<RequireAuth user={user}><Radicals /></RequireAuth>} />
         <Route path="/flashcards" element={<RequireAuth user={user}><Flashcards /></RequireAuth>} />
         <Route path="/quiz" element={<RequireAuth user={user}><Quiz user={user} onXpChange={setUser} /></RequireAuth>} />

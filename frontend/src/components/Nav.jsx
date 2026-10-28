@@ -2,11 +2,12 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useState, useRef, useLayoutEffect, useEffect } from 'react'
 import { avatarEmoji } from '../utils/avatars.js'
 import { useTheme, logoFor } from '../utils/theme.js'
+import { useTrack } from '../utils/track.js'
 import './Nav.css'
 
-const LINKS = [
+// Core tools, the same on every track.
+const CORE = [
   { to: '/', label: 'Home' },
-  { to: '/ib', label: 'IB' },
   { to: '/radicals', label: 'Radicals' },
   { to: '/flashcards', label: 'Flashcards' },
   { to: '/quiz', label: 'Quiz' },
@@ -20,12 +21,27 @@ const LINKS = [
   { to: '/about', label: 'About' }
 ]
 
+// The study track only moves the exam course: IB or IGCSE learners get their
+// course pinned second; everyone else still finds "IB / IGCSE" near the end
+// (usually inside "More"), so nothing is hidden from anyone.
+function linksFor(track) {
+  const l = [...CORE]
+  if (track === 'ib') l.splice(1, 0, { to: '/ib', label: 'IB' })
+  else if (track === 'igcse') {
+    l.splice(1, 0, { to: '/igcse', label: 'IGCSE' })
+    l.splice(l.findIndex(x => x.to === '/profile'), 0, { to: '/ib', label: 'IB' })
+  }
+  else l.splice(l.findIndex(x => x.to === '/profile'), 0, { to: '/ib', label: 'IB / IGCSE' })
+  return l
+}
+
 const isActive = (to, path) => (to === '/' ? path === '/' : path === to || path.startsWith(to + '/'))
 
 export default function Nav({ user, onLogout }) {
   const navigate = useNavigate()
   const location = useLocation()
   const [theme, setTheme] = useTheme()
+  const [track] = useTrack()
   const [menuOpen, setMenuOpen] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
   const [fit, setFit] = useState(99)
@@ -33,7 +49,8 @@ export default function Nav({ user, onLogout }) {
   const measureRef = useRef(null)
   const moreRef = useRef(null)
 
-  const links = user && user.isAdmin ? [...LINKS, { to: '/admin', label: 'Admin' }] : LINKS
+  const base = linksFor(track)
+  const links = user && user.isAdmin ? [...base, { to: '/admin', label: 'Admin' }] : base
 
   // Priority+ nav: every tab keeps the same size; whatever doesn't fit on one row
   // moves (from the end) into a "More" menu. Recalculated on resize and font load.
@@ -55,7 +72,7 @@ export default function Nav({ user, onLogout }) {
     if (wrapRef.current) ro.observe(wrapRef.current)
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(calc)
     return () => ro.disconnect()
-  }, [links.length, theme])
+  }, [links.length, theme, track])
 
   useEffect(() => { setMoreOpen(false); setMenuOpen(false) }, [location.pathname])
   useEffect(() => {

@@ -163,6 +163,9 @@ export const api = {
     })
   },
 
+  changeTrack: (track) =>
+    request('/api/users/change-track', { method: 'POST', body: JSON.stringify({ track }) }),
+
   uploadAvatar: (imageDataUri) => {
     const token = localStorage.getItem('mandalink_token')
     return request('/api/users/upload-avatar', {

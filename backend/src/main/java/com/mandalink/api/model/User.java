@@ -64,6 +64,12 @@ public class User {
     @Column(name = "featured_badge_key")
     private String featuredBadgeKey;
 
+    // Study track: "general", "ib" or "igcse". Null means the user hasn't
+    // chosen yet. Only changes which course the site puts first; every
+    // feature stays available on every track.
+    @Column(name = "study_track")
+    private String studyTrack;
+
     public User() {}
 
     public Long getId() { return id; }
@@ -116,4 +122,7 @@ public class User {
 
     public String getFeaturedBadgeKey() { return featuredBadgeKey; }
     public void setFeaturedBadgeKey(String featuredBadgeKey) { this.featuredBadgeKey = featuredBadgeKey; }
+
+    public String getStudyTrack() { return studyTrack; }
+    public void setStudyTrack(String studyTrack) { this.studyTrack = studyTrack; }
 }
