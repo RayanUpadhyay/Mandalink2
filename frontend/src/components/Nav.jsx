@@ -1,13 +1,11 @@
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useState, useRef, useLayoutEffect, useEffect } from 'react'
 import { avatarEmoji } from '../utils/avatars.js'
-import { useTheme, logoFor } from '../utils/theme.js'
-import { useTrack } from '../utils/track.js'
 import './Nav.css'
 
-// Core tools, the same on every track.
-const CORE = [
+const LINKS = [
   { to: '/', label: 'Home' },
+  { to: '/ib', label: 'IB' },
   { to: '/radicals', label: 'Radicals' },
   { to: '/flashcards', label: 'Flashcards' },
   { to: '/quiz', label: 'Quiz' },
@@ -21,27 +19,11 @@ const CORE = [
   { to: '/about', label: 'About' }
 ]
 
-// The study track only moves the exam course: IB or IGCSE learners get their
-// course pinned second; everyone else still finds "IB / IGCSE" near the end
-// (usually inside "More"), so nothing is hidden from anyone.
-function linksFor(track) {
-  const l = [...CORE]
-  if (track === 'ib') l.splice(1, 0, { to: '/ib', label: 'IB' })
-  else if (track === 'igcse') {
-    l.splice(1, 0, { to: '/igcse', label: 'IGCSE' })
-    l.splice(l.findIndex(x => x.to === '/profile'), 0, { to: '/ib', label: 'IB' })
-  }
-  else l.splice(l.findIndex(x => x.to === '/profile'), 0, { to: '/ib', label: 'IB / IGCSE' })
-  return l
-}
-
 const isActive = (to, path) => (to === '/' ? path === '/' : path === to || path.startsWith(to + '/'))
 
 export default function Nav({ user, onLogout }) {
   const navigate = useNavigate()
   const location = useLocation()
-  const [theme, setTheme] = useTheme()
-  const [track] = useTrack()
   const [menuOpen, setMenuOpen] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
   const [fit, setFit] = useState(99)
@@ -49,8 +31,7 @@ export default function Nav({ user, onLogout }) {
   const measureRef = useRef(null)
   const moreRef = useRef(null)
 
-  const base = linksFor(track)
-  const links = user && user.isAdmin ? [...base, { to: '/admin', label: 'Admin' }] : base
+  const links = user && user.isAdmin ? [...LINKS, { to: '/admin', label: 'Admin' }] : LINKS
 
   // Priority+ nav: every tab keeps the same size; whatever doesn't fit on one row
   // moves (from the end) into a "More" menu. Recalculated on resize and font load.
@@ -72,7 +53,7 @@ export default function Nav({ user, onLogout }) {
     if (wrapRef.current) ro.observe(wrapRef.current)
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(calc)
     return () => ro.disconnect()
-  }, [links.length, theme, track])
+  }, [links.length])
 
   useEffect(() => { setMoreOpen(false); setMenuOpen(false) }, [location.pathname])
   useEffect(() => {
@@ -85,12 +66,11 @@ export default function Nav({ user, onLogout }) {
   const visible = links.slice(0, fit)
   const overflow = links.slice(fit)
   const overflowActive = overflow.some(l => isActive(l.to, location.pathname))
-  const toggleTheme = () => setTheme(theme === 'v2' ? 'v1' : 'v2')
 
   return (
     <div className="topnav">
       <div className="logo-group" onClick={() => navigate('/')}>
-        <img src={logoFor(theme)} alt="Mandalink logo" />
+        <img src="/logo.png" alt="Mandalink logo" />
         <span className="logo-text">Mandalink</span>
       </div>
 
@@ -120,10 +100,6 @@ export default function Nav({ user, onLogout }) {
       </div>
 
       <div className="nav-right">
-        <div className="theme-switch" role="group" aria-label="Site look">
-          <button className={theme !== 'v2' ? 'on' : ''} aria-pressed={theme !== 'v2'} onClick={() => setTheme('v1')} title="Classic look">V1</button>
-          <button className={theme === 'v2' ? 'on' : ''} aria-pressed={theme === 'v2'} onClick={() => setTheme('v2')} title="New look">V2</button>
-        </div>
         {user ? (
           <>
             <button className="signin-btn nav-profile-btn" onClick={() => navigate('/profile')}>
@@ -146,7 +122,6 @@ export default function Nav({ user, onLogout }) {
           {links.map(link => (
             <div key={link.to} className="mobile-menu-link" onClick={() => navigate(link.to)}>{link.label}</div>
           ))}
-          <div className="mobile-menu-link" onClick={toggleTheme}>{theme === 'v2' ? 'Switch to V1 look' : 'Switch to V2 look'}</div>
         </div>
       )}
     </div>

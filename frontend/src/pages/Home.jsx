@@ -3,8 +3,6 @@ import { useEffect, useState } from 'react'
 import { api } from '../api.js'
 import { speakChinese, isSpeechSupported } from '../utils/speech.js'
 import { earnedBadges, nextBadge } from '../utils/badges.js'
-import { useTheme, logoFor } from '../utils/theme.js'
-import TrackCard from '../components/TrackCard.jsx'
 import './Home.css'
 
 const primaryChar = (character) => (character || '').split(' ')[0].trim()
@@ -18,7 +16,6 @@ const formatCountdown = (seconds) => {
 }
 
 export default function Home({ user }) {
-  const [theme] = useTheme()
   const navigate = useNavigate()
   const [radicalCount, setRadicalCount] = useState(null)
   const [cotd, setCotd] = useState(null)
@@ -71,7 +68,7 @@ export default function Home({ user }) {
   return (
     <div className="page">
       <div className="hero card">
-        <img src={logoFor(theme)} alt="Mandalink logo" className="hero-logo" />
+        <img src="/logo.png" alt="Mandalink logo" className="hero-logo" />
         <h1 className="hero-h">Mandalink</h1>
         <p className="hero-tagline">Chinese Radicals Simplified</p>
         <div className="hero-divider"></div>
@@ -98,8 +95,6 @@ export default function Home({ user }) {
           <p className="hero-count hero-count-highlight">{radicalCount} radicals ready to learn — Lifetime Free Access</p>
         )}
       </div>
-
-      <TrackCard />
 
       {cotd && (
         <div className="card cotd-card">
