@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/badge-drops")
@@ -29,8 +30,13 @@ public class BadgeDropController {
         this.jwtService = jwtService;
     }
 
+    public record PermanentDrop(Long dropId, String name, String icon, String description, Boolean alreadyClaimed) {}
+
+    // hasActiveDrop and the fields after it describe the current 24-hour drop; `permanent` lists the
+    // always-available badges (see BadgeDropRepository.isPermanent), which show alongside it.
     public record ActiveDropResponse(boolean hasActiveDrop, Long dropId, String name, String icon,
-                                      String description, Long secondsRemaining, Boolean alreadyClaimed) {}
+                                      String description, Long secondsRemaining, Boolean alreadyClaimed,
+                                      List<PermanentDrop> permanent) {}
 
     private User userFromToken(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) return null;
@@ -42,21 +48,26 @@ public class BadgeDropController {
     @GetMapping("/active")
     public ActiveDropResponse active(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         LocalDateTime now = LocalDateTime.now();
+        User user = userFromToken(authHeader);
+        List<PermanentDrop> permanent = badgeDropRepository.findPermanent(now).stream()
+            .map(d -> new PermanentDrop(d.getId(), d.getName(), d.getIcon(), d.getDescription(),
+                user == null ? null : badgeClaimRepository.existsByUserIdAndDropId(user.getId(), d.getId())))
+            .toList();
+
         var dropOpt = badgeDropRepository.findActive(now);
         if (dropOpt.isEmpty()) {
-            return new ActiveDropResponse(false, null, null, null, null, null, null);
+            return new ActiveDropResponse(false, null, null, null, null, null, null, permanent);
         }
         BadgeDrop drop = dropOpt.get();
         long secondsRemaining = ChronoUnit.SECONDS.between(now, drop.getExpiresAt());
 
         Boolean claimed = null;
-        User user = userFromToken(authHeader);
         if (user != null) {
             claimed = badgeClaimRepository.existsByUserIdAndDropId(user.getId(), drop.getId());
         }
 
         return new ActiveDropResponse(true, drop.getId(), drop.getName(), drop.getIcon(),
-            drop.getDescription(), Math.max(0, secondsRemaining), claimed);
+            drop.getDescription(), Math.max(0, secondsRemaining), claimed, permanent);
     }
 
     public record ClaimRequest(Long dropId) {}
