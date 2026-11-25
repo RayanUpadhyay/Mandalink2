@@ -31,6 +31,18 @@ export default function About() {
           moments.
         </p>
         <p className="about-text">
+          Curious how it was made? I've built Mandalink twice: first as a Python and Streamlit
+          app, then from scratch with React and Spring Boot. I wrote up the whole story, with a
+          diagram and a timeline, at{' '}
+          <a href="https://mandalink.rayanupadhyay.com" target="_blank" rel="noopener noreferrer" className="about-link">
+            mandalink.rayanupadhyay.com
+          </a>
+          , and the rest of what I make lives at{' '}
+          <a href="https://rayanupadhyay.com" target="_blank" rel="noopener noreferrer" className="about-link">
+            rayanupadhyay.com
+          </a>.
+        </p>
+        <p className="about-text">
           Have a question, found a bug, or just want to say hi? Please reach out to me at{' '}
           <a href="mailto:mandalinksupport@gmail.com" className="about-link">
             mandalinksupport@gmail.com
