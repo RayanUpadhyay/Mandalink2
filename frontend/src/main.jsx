@@ -12,3 +12,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </React.StrictMode>
 )
+
+// The service worker (public/sw.js) makes the site installable and lets the app shell open offline.
+// Production builds only, so local development never serves stale files.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js?v=' + __BUILD_ID__).catch(() => {})
+  })
+}
