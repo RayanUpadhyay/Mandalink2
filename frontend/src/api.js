@@ -101,12 +101,12 @@ export const api = {
   claimBadgeDrop: (dropId) =>
     request('/api/badge-drops/claim', { method: 'POST', body: JSON.stringify({ dropId }) }),
 
-  createBadgeDrop: (name, icon, description) => {
+  createBadgeDrop: (name, icon, description, permanent = false) => {
     const token = localStorage.getItem('mandalink_token')
     return request('/api/admin/badge-drops', {
       method: 'POST',
       headers: token ? { Authorization: `Bearer ${token}` } : {},
-      body: JSON.stringify({ name, icon, description })
+      body: JSON.stringify({ name, icon, description, permanent })
     })
   },
 

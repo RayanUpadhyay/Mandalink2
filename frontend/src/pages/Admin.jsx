@@ -12,6 +12,7 @@ export default function Admin() {
   const [dropName, setDropName] = useState('')
   const [dropIcon, setDropIcon] = useState('')
   const [dropDesc, setDropDesc] = useState('')
+  const [dropPermanent, setDropPermanent] = useState(false)
   const [dropBusy, setDropBusy] = useState(false)
   const [dropMessage, setDropMessage] = useState(null)
 
@@ -102,10 +103,10 @@ export default function Admin() {
     setDropBusy(true)
     setDropMessage(null)
     try {
-      const result = await api.createBadgeDrop(dropName, dropIcon, dropDesc)
+      const result = await api.createBadgeDrop(dropName, dropIcon, dropDesc, dropPermanent)
       setDropMessage({ type: result.success ? 'success' : 'error', text: result.message })
       if (result.success) {
-        setDropName(''); setDropIcon(''); setDropDesc('')
+        setDropName(''); setDropIcon(''); setDropDesc(''); setDropPermanent(false)
         load()
       }
     } catch (e) {
@@ -260,7 +261,7 @@ export default function Admin() {
           </div>
         ) : (
           <>
-            <p className="helper">No active drop. Create one — it'll be live for exactly 24 hours.</p>
+            <p className="helper">No active drop. Create one — it'll be live for exactly 24 hours, unless you keep it permanently. Permanent badges (like the Great Sage) stay claimable on the home page and never block a new drop.</p>
             <div className="admin-drop-form">
               <input
                 className="admin-drop-input"
@@ -281,8 +282,12 @@ export default function Admin() {
                 value={dropDesc}
                 onChange={e => setDropDesc(e.target.value)}
               />
+              <label className="helper" style={{ display: 'flex', alignItems: 'center', gap: 6, margin: 0 }}>
+                <input type="checkbox" checked={dropPermanent} onChange={e => setDropPermanent(e.target.checked)} />
+                Keep it permanently
+              </label>
               <button className="btn primary" disabled={dropBusy} onClick={submitDrop}>
-                {dropBusy ? 'Creating...' : 'Launch drop'}
+                {dropBusy ? 'Creating...' : dropPermanent ? 'Add permanent badge' : 'Launch drop'}
               </button>
             </div>
           </>

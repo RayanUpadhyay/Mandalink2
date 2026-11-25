@@ -45,18 +45,23 @@ export default function Home({ user }) {
     return () => clearInterval(interval)
   }, [drop])
 
-  const claimDrop = async () => {
-    if (!drop) return
-    setClaiming(true)
+  // claims either the current 24-hour drop or one of the permanent badges
+  const claimDrop = async (dropId = drop && drop.dropId) => {
+    if (!drop || !dropId) return
+    setClaiming(dropId)
     setClaimMessage(null)
     try {
-      const result = await api.claimBadgeDrop(drop.dropId)
-      setClaimMessage(result.message)
+      const result = await api.claimBadgeDrop(dropId)
+      setClaimMessage({ dropId, text: result.message })
       if (result.success) {
-        setDrop(d => ({ ...d, alreadyClaimed: true }))
+        setDrop(d => ({
+          ...d,
+          alreadyClaimed: d.dropId === dropId ? true : d.alreadyClaimed,
+          permanent: (d.permanent || []).map(p => p.dropId === dropId ? { ...p, alreadyClaimed: true } : p)
+        }))
       }
     } catch (e) {
-      setClaimMessage('Could not reach the server.')
+      setClaimMessage({ dropId, text: 'Could not reach the server.' })
     } finally {
       setClaiming(false)
     }
@@ -125,14 +130,35 @@ export default function Home({ user }) {
             {drop.alreadyClaimed ? (
               <div className="drop-claimed">✓ Claimed</div>
             ) : (
-              <button className="btn primary" disabled={claiming || secondsLeft <= 0} onClick={claimDrop}>
-                {claiming ? 'Claiming...' : 'Claim'}
+              <button className="btn primary" disabled={!!claiming || secondsLeft <= 0} onClick={() => claimDrop(drop.dropId)}>
+                {claiming === drop.dropId ? 'Claiming...' : 'Claim'}
               </button>
             )}
           </div>
-          {claimMessage && <p className="helper" style={{ margin: '10px 0 0' }}>{claimMessage}</p>}
+          {claimMessage && claimMessage.dropId === drop.dropId && <p className="helper" style={{ margin: '10px 0 0' }}>{claimMessage.text}</p>}
         </div>
       )}
+
+      {user && drop && (drop.permanent || []).map(p => (
+        <div className="card drop-card" key={p.dropId}>
+          <div className="cotd-label">🏅 Always available</div>
+          <div className="drop-row">
+            <div className="drop-icon">{p.icon}</div>
+            <div className="drop-info">
+              <div className="drop-name">{p.name}</div>
+              <div className="drop-desc">{p.description}</div>
+            </div>
+            {p.alreadyClaimed ? (
+              <div className="drop-claimed">✓ Claimed</div>
+            ) : (
+              <button className="btn primary" disabled={!!claiming} onClick={() => claimDrop(p.dropId)}>
+                {claiming === p.dropId ? 'Claiming...' : 'Claim'}
+              </button>
+            )}
+          </div>
+          {claimMessage && claimMessage.dropId === p.dropId && <p className="helper" style={{ margin: '10px 0 0' }}>{claimMessage.text}</p>}
+        </div>
+      ))}
 
       {user && (
         <div className="card badges-card">

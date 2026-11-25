@@ -116,7 +116,7 @@ public class AdminController {
             : target.getUsername() + " is no longer an admin.");
     }
 
-    public record CreateDropRequest(String name, String icon, String description) {}
+    public record CreateDropRequest(String name, String icon, String description, Boolean permanent) {}
     public record CreateDropResponse(boolean success, String message) {}
 
     @PostMapping("/badge-drops")
@@ -130,7 +130,9 @@ public class AdminController {
             return new CreateDropResponse(false, "Name and icon are required.");
         }
         LocalDateTime now = LocalDateTime.now();
-        if (badgeDropRepository.findActive(now).isPresent()) {
+        boolean permanent = Boolean.TRUE.equals(req.permanent());
+        // only one 24-hour drop at a time; permanent badges never get in the way
+        if (!permanent && badgeDropRepository.findActive(now).isPresent()) {
             return new CreateDropResponse(false, "There's already an active drop — end it first or wait for it to expire.");
         }
 
@@ -139,10 +141,10 @@ public class AdminController {
         drop.setIcon(req.icon().trim());
         drop.setDescription(req.description() == null ? "" : req.description().trim());
         drop.setCreatedAt(now);
-        drop.setExpiresAt(now.plusHours(24));
+        drop.setExpiresAt(permanent ? now.plusYears(100) : now.plusHours(24));
         badgeDropRepository.save(drop);
 
-        return new CreateDropResponse(true, "Drop created — live for 24 hours.");
+        return new CreateDropResponse(true, permanent ? "Permanent badge created — always claimable." : "Drop created — live for 24 hours.");
     }
 
     @PostMapping("/badge-drops/end")
