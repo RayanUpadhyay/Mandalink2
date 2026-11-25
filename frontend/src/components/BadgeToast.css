@@ -42,3 +42,5 @@
     max-width: none;
   }
 }
+
+.badge-toast { bottom: calc(24px + env(safe-area-inset-bottom)); right: max(24px, env(safe-area-inset-right)); }

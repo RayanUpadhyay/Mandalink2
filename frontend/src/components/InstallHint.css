@@ -1,0 +1,33 @@
+/* A small card at the bottom of the screen (never over the nav), above the home indicator */
+.install-hint {
+  position: fixed;
+  left: max(12px, env(safe-area-inset-left));
+  right: max(12px, env(safe-area-inset-right));
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 60;
+  max-width: 440px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px 12px 14px;
+  background: #ffffff;
+  border: 1.5px solid var(--blue);
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.15);
+  font-family: 'Manrope', sans-serif;
+  animation: install-hint-in .35s ease-out;
+}
+.install-hint-icon { flex: none; width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--panel-border); }
+.install-hint-text { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.35; }
+.install-hint-text b { font-size: 14px; font-weight: 800; color: var(--text-hi); }
+.install-hint-text span { font-size: 13.5px; color: var(--text-mid); }
+.install-hint-share { width: 16px; height: 16px; vertical-align: -3px; color: var(--blue); }
+.install-hint-close {
+  flex: none; width: 34px; height: 34px; border-radius: 50%;
+  border: none; background: var(--blue-soft); color: var(--blue-dark);
+  font-size: 14px; font-weight: 800; cursor: pointer;
+}
+.install-hint-close:hover { background: #dbe9fa; }
+@keyframes install-hint-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .install-hint { animation: none; } }

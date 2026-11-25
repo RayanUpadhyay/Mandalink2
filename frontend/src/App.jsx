@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
+import InstallHint from './components/InstallHint.jsx'
 import Nav from './components/Nav.jsx'
 import RequireAuth from './components/RequireAuth.jsx'
 import { api } from './api.js'
@@ -102,6 +103,7 @@ export default function App() {
           </RequireAuth>
         } />
       </Routes>
+      <InstallHint />
     </>
   )
 }

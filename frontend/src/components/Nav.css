@@ -173,3 +173,10 @@
   object-fit: cover;
   vertical-align: middle;
 }
+
+/* Safe areas (notch, rounded corners) when the site runs full-screen from the home screen */
+.topnav {
+  padding-top: calc(14px + env(safe-area-inset-top));
+  padding-left: max(32px, env(safe-area-inset-left));
+  padding-right: max(32px, env(safe-area-inset-right));
+}
