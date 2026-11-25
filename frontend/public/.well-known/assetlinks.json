@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "org.mandalink.app",
+    "sha256_cert_fingerprints": ["EB:8F:9A:64:6A:AD:23:57:E0:D3:8C:0B:A0:B6:03:69:65:54:B8:E4:ED:C6:D0:DB:DB:5F:7C:A5:3B:8B:00:AF"]
+  }
+}]
