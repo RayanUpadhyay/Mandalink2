@@ -231,3 +231,13 @@
   color: var(--blue);
   font-weight: 800;
 }
+
+.hero-apps {
+  margin: 14px auto 0;
+  max-width: 560px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-mid);
+}
+.hero-apps a { color: var(--blue); font-weight: 700; text-decoration: none; white-space: nowrap; }
+.hero-apps a:hover { text-decoration: underline; }

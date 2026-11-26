@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { APK_URL, isInstalled } from '../utils/platform.js'
 import { useEffect, useState } from 'react'
 import { api } from '../api.js'
 import { speakChinese, isSpeechSupported } from '../utils/speech.js'
@@ -16,6 +17,7 @@ const formatCountdown = (seconds) => {
 }
 
 export default function Home({ user }) {
+  const [installed] = useState(() => isInstalled())
   const navigate = useNavigate()
   const [radicalCount, setRadicalCount] = useState(null)
   const [cotd, setCotd] = useState(null)
@@ -98,6 +100,11 @@ export default function Home({ user }) {
         </div>
         {radicalCount !== null && (
           <p className="hero-count hero-count-highlight">{radicalCount} radicals ready to learn — Lifetime Free Access</p>
+        )}
+        {!installed && (
+          <p className="hero-apps">
+            📱 On your phone: <a href={APK_URL}>⬇ Android app</a> · iPhone: open in Safari, tap Share, then Add to Home Screen
+          </p>
         )}
       </div>
 

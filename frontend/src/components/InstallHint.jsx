@@ -1,38 +1,44 @@
 import { useEffect, useState } from 'react'
 import './InstallHint.css'
 
-const KEY = 'mandalink_ios_install_hint_dismissed'
+import { APK_URL, isAndroid, isIosSafari, isInstalled } from '../utils/platform.js'
 
-// iPhone and iPad Safari only: other iOS browsers (Chrome, Firefox, Edge, the Google app…) can't add a web app this way
-function isIosSafari() {
-  const ua = navigator.userAgent || ''
-  const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-  const safari = /Safari\//.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|GSA\/|YaBrowser|DuckDuckGo/.test(ua)
-  return ios && safari
-}
+const KEYS = { ios: 'mandalink_ios_install_hint_dismissed', android: 'mandalink_android_hint_dismissed' }
 
-function isStandalone() {
-  return window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches
-}
-
-function dismissed() {
-  try { return localStorage.getItem(KEY) === '1' } catch (e) { return false }
+function dismissed(kind) {
+  try { return localStorage.getItem(KEYS[kind]) === '1' } catch (e) { return false }
 }
 
 export default function InstallHint() {
-  const [show, setShow] = useState(false)
+  const [show, setShow] = useState(null)  // null, 'ios' or 'android'
 
   useEffect(() => {
-    if (!isIosSafari() || isStandalone() || dismissed()) return
-    const t = setTimeout(() => setShow(true), 1500)
+    if (isInstalled()) return
+    const kind = isIosSafari() ? 'ios' : isAndroid() ? 'android' : null
+    if (!kind || dismissed(kind)) return
+    const t = setTimeout(() => setShow(kind), 1500)
     return () => clearTimeout(t)
   }, [])
 
   if (!show) return null
 
   const close = () => {
-    setShow(false)
-    try { localStorage.setItem(KEY, '1') } catch (e) {}
+    try { localStorage.setItem(KEYS[show], '1') } catch (e) {}
+    setShow(null)
+  }
+
+  if (show === 'android') {
+    return (
+      <div className="install-hint" role="dialog" aria-label="Get the Mandalink Android app">
+        <img src="/apple-touch-icon.png" alt="" className="install-hint-icon" width="40" height="40" />
+        <div className="install-hint-text">
+          <b>Get the Android app</b>
+          <span>Free. Opens Mandalink full-screen from your home screen.</span>
+        </div>
+        <a className="install-hint-get" href={APK_URL} onClick={close}>Download</a>
+        <button type="button" className="install-hint-close" onClick={close} aria-label="Dismiss">✕</button>
+      </div>
+    )
   }
 
   return (
