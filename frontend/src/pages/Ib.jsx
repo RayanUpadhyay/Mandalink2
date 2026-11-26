@@ -3,17 +3,18 @@ import { Link, useParams } from 'react-router-dom'
 import HanziWriter from 'hanzi-writer'
 import { UNIT1, TEXT_TYPES } from '../ib/unit1.js'
 import { UNIT2 } from '../ib/unit2.js'
+import { UNIT3 } from '../ib/unit3.js'
 import CHAR_INFO from '../ib/charInfo.json'
 import { speakChinese, isSpeechSupported } from '../utils/speech.js'
 import './Ib.css'
 
 // ---------------------------------------------------------------- course map
-// Mirrors the iChinese 3 contents: 2 themes x 5 units. Units 1 and 2 are built so far.
+// Mirrors the iChinese 3 contents: 2 themes x 5 units. Units 1 to 3 are built so far.
 const COURSE = [
   { no: 1, zh: '身份认同', en: 'Identities', units: [
     { no: 1, zh: '生活方式', en: 'Lifestyle', data: UNIT1 },
     { no: 2, zh: '健康和幸福', en: 'Health and Well-being', data: UNIT2 },
-    { no: 3, zh: '信念和价值观', en: 'Beliefs and Values' },
+    { no: 3, zh: '信念和价值观', en: 'Beliefs and Values', data: UNIT3 },
     { no: 4, zh: '次文化', en: 'Subcultures' },
     { no: 5, zh: '语言与身份认同', en: 'Language and Identity' }
   ] },
@@ -25,7 +26,7 @@ const COURSE = [
     { no: 5, zh: '迁移', en: 'Migration' }
   ] }
 ]
-const UNITS = { u1: UNIT1, u2: UNIT2 }
+const UNITS = { u1: UNIT1, u2: UNIT2, u3: UNIT3 }
 const CIRCLED = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩']
 
 // ---------------------------------------------------------------- progress (saved in this browser)

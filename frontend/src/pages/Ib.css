@@ -150,3 +150,6 @@
   .ib-passage { padding: 18px; } .ib-passage p, .ib-exam { font-size: 16px; }
   .ib-table th { width: 44%; }
 }
+
+/* interview passages put each speaker on its own line */
+.ib-passage p { white-space: pre-line; }
