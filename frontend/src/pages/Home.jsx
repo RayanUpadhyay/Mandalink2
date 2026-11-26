@@ -101,12 +101,21 @@ export default function Home({ user }) {
         {radicalCount !== null && (
           <p className="hero-count hero-count-highlight">{radicalCount} radicals ready to learn — Lifetime Free Access</p>
         )}
-        {!installed && (
-          <p className="hero-apps">
-            📱 On your phone: <a href={APK_URL}>⬇ Android app</a> · iPhone: open in Safari, tap Share, then Add to Home Screen
-          </p>
-        )}
       </div>
+
+      {!installed && (
+        <div className="card app-card">
+          <div className="app-card-text">
+            <div className="cotd-label">📱 New · Mandalink on your phone</div>
+            <h2 className="app-card-h">Learn anywhere, straight from your home screen.</h2>
+            <p className="app-card-p">Install Mandalink like any other app. It's free, and your account comes with you.</p>
+            <a className="btn primary app-card-btn" href={APK_URL}>⬇ Get the Android app</a>
+            <p className="app-card-ios"><b>iPhone:</b> open mandalink.org in Safari, tap Share, then <b>Add to Home Screen</b>.</p>
+          </div>
+          <video className="app-card-video" src="/mandalink-install.mp4" poster="/mandalink-install-poster.jpg"
+            controls preload="none" playsInline aria-label="How to install Mandalink on Android and iPhone: a 45-second walkthrough" />
+        </div>
+      )}
 
       {cotd && (
         <div className="card cotd-card">
